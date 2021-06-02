@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import BasePage, { BasePageProperties } from '../BasePage/BasePage';
-import axios from 'axios';
-import CategoryModel from '../../../../node/src/components/category/model';
+import CategoryModel from '../../models/CategoryModel';
+import CategoryService from '../../services/CategoryService';
 
 class CategoryPageProperties extends BasePageProperties {
   match?: {
@@ -49,85 +49,43 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
   }
 
   private apiGetTopLevelCategories() {
-    axios({
-      method: 'GET',
-      baseURL: 'http://localhost:40080',
-      url: '/category',
-      timeout: 10000,
-      responseType: 'text',
-      headers: {
-        Authorization: 'Bearer FAKE-TOKEN'
-      },
-      // withCredentials: true,
-      maxRedirects: 0
-    })
-      .then(res => {
-        if (!Array.isArray(res.data)) {
-          throw new Error();
+    CategoryService.getTopLevelCategories()
+      .then(categories => {
+        if (categories.length === 0) {
+          return this.setState({
+            title: 'No categories found',
+            subCategories: [],
+            showBackButton: true,
+            parentCategoryId: null
+          })
         }
 
         this.setState({
           title: 'All categories',
-          subCategories: res.data,
+          subCategories: categories,
           showBackButton: false
         })
-      })
-      .catch(err => {
-        const errorMessage = '' + err;
-
-        if (errorMessage.includes('404')) {
-          this.setState({
-            title: 'No categories found',
-            subCategories: []
-          })
-        } else {
-          console.log(err)
-          this.setState({
-            title: 'Unable to load categories.',
-            subCategories: []
-          })
-        }
       })
   }
 
   private apiGetCategory(cId: number) {
-    axios({
-      method: 'GET',
-      baseURL: 'http://localhost:40080',
-      url: '/category/' + cId,
-      timeout: 10000,
-      responseType: 'text',
-      headers: {
-        Authorization: 'Bearer FAKE-TOKEN'
-      },
-      // withCredentials: true,
-      maxRedirects: 0
-    })
-      .then(res => {
-        this.setState({
-          title: res.data?.name,
-          subCategories: res.data?.subCategories,
-          parentCategoryId: res.data?.parentCategoryId,
-          showBackButton: true
-        })
-
-        console.log(res.data)
-      })
-      .catch(err => {
-        const errorMessage = '' + err;
-
-        if (errorMessage.includes('404')) {
-          this.setState({
-            title: 'No category found',
-            subCategories: []
-          })
-        } else {
-          console.log(err)
-          this.setState({
-            title: 'Unable to load category.',
-            subCategories: []
+    CategoryService.getCategoryById(cId)
+      .then(result => {
+        if (result === null) {
+          return this.setState({
+            title: 'Category not  found.',
+            subCategories: [],
+            showBackButton: true,
+            parentCategoryId: null
           })
         }
+
+        this.setState({
+          title: result.name,
+          subCategories: result.subCategories,
+          parentCategoryId: result.parentCategoryId,
+          showBackButton: true
+        })
       })
   }
 
@@ -146,7 +104,7 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
       <>
         {
           this.state.showBackButton
-          ? (
+            ? (
               <Link to={ '/category/' + (this.state.parentCategoryId ?? '') }>
                 &lt; Back
               </Link>
@@ -157,7 +115,7 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
 
         {
           this.state.subCategories.length > 0
-          ? (
+            ? (
               <>
                 <p>Podkategorije:</p>
                 <ul>
