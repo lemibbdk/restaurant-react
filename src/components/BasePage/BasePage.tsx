@@ -3,15 +3,12 @@ import { Row, Col } from 'react-bootstrap';
 
 class BasePageProperties {
   sidebar?: JSX.Element = undefined;
+  match?: any;
 }
 
 export { BasePageProperties }
 
 export default abstract class BasePage<Properties extends BasePageProperties> extends React.Component<Properties> {
-  constructor(props: Properties) {
-    super(props);
-  }
-
   render() {
     const sidebarSizedOnMd = this.props.sidebar ? 3 : 0;
     const sidebarSizedOnLg = this.props.sidebar ? 3 : 0;

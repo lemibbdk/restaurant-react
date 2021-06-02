@@ -17,9 +17,17 @@ function Application() {
         <TopMenu />
         <div className="Application-body">
           <Switch>
-            <Route exact path="/" component={HomePage} />
+            <Route exact path="/" component={ HomePage } />
 
-            <Route exact path="/category" component={CategoryPage} />
+            <Route path="/category/:cid?"
+              render={
+                (props: any) => {
+                  return (
+                    <CategoryPage { ...props } />
+                  )
+                }
+              }
+            />
 
             <Route path="/contact">
               <ContactPage title="Our location in Belgrade" phone="+381 11 462 44 75" address="Sarajevska 14" />

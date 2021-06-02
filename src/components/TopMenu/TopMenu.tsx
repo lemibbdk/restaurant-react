@@ -9,6 +9,9 @@ export default function TopMenu() {
         <Link className="nav-link" to='/'>Home</Link>
       </Nav.Item>
       <Nav.Item>
+        <Link className="nav-link" to='/category'>Categories</Link>
+      </Nav.Item>
+      <Nav.Item>
         <Link className="nav-link" to='/contact'>Contact</Link>
       </Nav.Item>
       <Nav.Item>
