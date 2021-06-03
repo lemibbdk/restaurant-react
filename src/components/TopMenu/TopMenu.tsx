@@ -7,14 +7,6 @@ class TopMenuProperties {
 }
 
 export default class TopMenu extends React.Component<TopMenuProperties> {
-  componentDidMount() {
-
-  }
-
-  componentWillUnmount() {
-
-  }
-
   render() {
     if (this.props.currentMenuType === "visitor") {
       return (

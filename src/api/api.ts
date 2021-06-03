@@ -16,8 +16,8 @@ export default function api (
   role: ApiRole = 'user',
   body: any | undefined = undefined,
   attemptToRefresh: boolean = true
-): Promise<ApiResponse|undefined> {
-  return new Promise<ApiResponse | undefined>(resolve => {
+): Promise<ApiResponse> {
+  return new Promise<ApiResponse>(resolve => {
     axios({
       method: method,
       baseURL: AppConfiguration.API_URL,
@@ -72,13 +72,13 @@ export default function api (
 
         resolve({
           status: 'error',
-          data: '' + err?.response
+          data: err?.response
         })
       })
   });
 }
 
-function responseHandler(res: AxiosResponse, resolve: (data?: ApiResponse) => void) {
+function responseHandler(res: AxiosResponse, resolve: (data: ApiResponse) => void) {
   if (res?.status < 200 || res?.status >= 300) {
     return resolve({
       status: 'error',
