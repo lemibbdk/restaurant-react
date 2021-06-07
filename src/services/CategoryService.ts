@@ -32,7 +32,7 @@ export default class CategoryService {
             return resolve(null);
           }
 
-          resolve(res.data as CategoryModel)
+          resolve(res.data as CategoryModel);
         });
     })
   }

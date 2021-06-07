@@ -3,6 +3,10 @@ import BasePage, { BasePageProperties } from '../BasePage/BasePage';
 import CategoryModel from '../../models/CategoryModel';
 import CategoryService from '../../services/CategoryService';
 import EventRegister from '../../api/EventRegister';
+import ItemModel from '../../models/ItemModel';
+import ItemService from '../../services/ItemService';
+import { CardDeck } from 'react-bootstrap';
+import Item from '../Item/Item';
 
 class CategoryPageProperties extends BasePageProperties {
   match?: {
@@ -18,6 +22,7 @@ class CategoryPageState {
   showBackButton: boolean = false;
   parentCategoryId: number | null = null;
   isUserLoggedIn: boolean = true;
+  items: ItemModel[] = [];
 }
 
 export default class CategoryPage extends BasePage<CategoryPageProperties> {
@@ -31,7 +36,8 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
       subCategories: [],
       showBackButton: false,
       parentCategoryId: null,
-      isUserLoggedIn: true
+      isUserLoggedIn: true,
+      items: []
     }
   }
 
@@ -47,7 +53,8 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
     if (cId === null) {
       this.apiGetTopLevelCategories();
     } else {
-      this.apiGetCategory(cId)
+      this.apiGetCategory(cId);
+      this.apiGetItems(cId);
     }
   }
 
@@ -90,6 +97,15 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
           showBackButton: true
         })
       })
+  }
+
+  apiGetItems(cId: number) {
+    ItemService.getItemsByCategoryId(cId)
+      .then(res => {
+        this.setState({
+          items: res
+        })
+      });
   }
 
   componentDidMount() {
@@ -155,6 +171,14 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
             )
             : ''
         }
+
+        <CardDeck className="row">
+          {
+            this.state.items.map(item => (
+              <Item key={ "item-" + item.itemId } item={ item } />
+            ))
+          }
+        </CardDeck>
       </>
     );
   }
