@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import BasePage, { BasePageProperties } from '../BasePage/BasePage';
 import CategoryModel from '../../models/CategoryModel';
 import CategoryService from '../../services/CategoryService';
+import EventRegister from '../../api/EventRegister';
 
 class CategoryPageProperties extends BasePageProperties {
   match?: {
@@ -16,6 +17,7 @@ class CategoryPageState {
   subCategories: CategoryModel[] = [];
   showBackButton: boolean = false;
   parentCategoryId: number | null = null;
+  isUserLoggedIn: boolean = true;
 }
 
 export default class CategoryPage extends BasePage<CategoryPageProperties> {
@@ -28,7 +30,8 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
       title: '',
       subCategories: [],
       showBackButton: false,
-      parentCategoryId: null
+      parentCategoryId: null,
+      isUserLoggedIn: true
     }
   }
 
@@ -91,6 +94,8 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
 
   componentDidMount() {
     this.getCategoryData();
+
+    EventRegister.on('AUTH_EVENT', this.authEventHandler.bind(this));
   }
 
   componentDidUpdate(prevProps: Readonly<CategoryPageProperties>, prevState: Readonly<CategoryPageState>, snapshot?: any) {
@@ -99,7 +104,25 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
     }
   }
 
+  componentWillUnmount() {
+    EventRegister.off('AUTH_EVENT', this.authEventHandler.bind(this));
+  }
+
+  private authEventHandler(status: string) {
+    if (status === 'force_login') {
+      this.setState({
+        isUserLoggedIn: false
+      })
+    }
+  }
+
   renderMain(): JSX.Element {
+    if (!this.state.isUserLoggedIn) {
+      return (
+        <Redirect to='/user/login' />
+      );
+    }
+
     return (
       <>
         {

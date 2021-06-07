@@ -8,7 +8,8 @@ import CategoryPage from '../CategoryPage/CategoryPage';
 import ContactPage from '../ContactPage/ContactPage';
 import EventRegister from '../../api/EventRegister';
 import api from '../../api/api';
-import UserLogin from '../User/UserLogin';
+import UserLogin from '../UserLogin/UserLogin';
+import UserLogout from '../UserLogout/UserLogout';
 
 class ApplicationState {
   authorizedRole: "user" | "administrator" | "visitor" = "visitor";
@@ -96,7 +97,7 @@ export default class Application extends React.Component {
               </Route>
 
               <Route path="/user/login" component={UserLogin} />
-
+              <Route path="/user/logout" component={UserLogout} />
             </Switch>
           </div>
           <div>
