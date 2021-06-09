@@ -2,7 +2,6 @@ import BasePage from '../BasePage/BasePage';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
 import React from 'react';
 import AuthService, { IPostalAddressData } from '../../services/AuthService';
-import FormContext from 'react-bootstrap/FormContext';
 import { Redirect } from 'react-router-dom';
 
 class UserRegistrationState {

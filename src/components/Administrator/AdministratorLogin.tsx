@@ -5,21 +5,21 @@ import { Button, Card, Col, Form, Row } from 'react-bootstrap';
 import React from 'react';
 import AuthService from '../../services/AuthService';
 
-class UserLoginState {
-  email: string = '';
+class AdministratorLoginState {
+  username: string = '';
   password: string = '';
   message: string = '';
   isLoggedIn: boolean = false;
 }
 
-export default class UserLogin extends BasePage<{}> {
-  state: UserLoginState;
+export default class AdministratorLogin extends BasePage<{}> {
+  state: AdministratorLoginState;
 
   constructor(props: any) {
     super(props);
 
     this.state = {
-      email: '',
+      username: '',
       password: '',
       message: '',
       isLoggedIn: false
@@ -35,10 +35,10 @@ export default class UserLogin extends BasePage<{}> {
   }
 
   private handleAuthEvent(status: string, data: any) {
-    if (status === 'user_login_failed') {
-      if (Array.isArray(data?.data) && data?.data[0]?.instancePath === '/email') {
+    if (status === 'administrator_login_failed') {
+      if (Array.isArray(data?.data) && data?.data[0]?.instancePath === '/username') {
         return this.setState({
-          message: 'Invalid email: ' + data?.data[0]?.message
+          message: 'Invalid username: ' + data?.data[0]?.message
         });
       }
 
@@ -50,33 +50,33 @@ export default class UserLogin extends BasePage<{}> {
 
       if (data?.status === 404) {
         return this.setState({
-          message: 'User not found: '
+          message: 'Administrator not found: '
         });
       }
 
-      if (data?.status === 400 && data?.data === 'Invalid user password.') {
+      if (data?.status === 400 && data?.data === 'Invalid administrator password.') {
         return this.setState({
           message: 'Wrong password.'
         });
       }
 
-      if (data?.status === 400 && data?.data === 'User account inactive.') {
+      if (data?.status === 400 && data?.data === 'Administrator account inactive.') {
         return this.setState({
           message: 'Account is inactive.'
         });
       }
     }
 
-    if (status === "user_login") {
+    if (status === 'administrator_login') {
       return this.setState({
-        email: "",
-        password: "",
+        username: '',
+        password: '',
         isLoggedIn: true,
       });
     }
   }
 
-  private onChangeInput(field: 'email' | 'password'): (event: React.ChangeEvent<HTMLInputElement>) => void {
+  private onChangeInput(field: 'username' | 'password'): (event: React.ChangeEvent<HTMLInputElement>) => void {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
       this.setState({
         [field]: event.target.value
@@ -85,13 +85,13 @@ export default class UserLogin extends BasePage<{}> {
   }
 
   private handleLogInButtonClick() {
-    AuthService.userLogin(this.state.email, this.state.password);
+    AuthService.administratorLogin(this.state.username, this.state.password);
   }
 
   renderMain(): JSX.Element {
     if (this.state.isLoggedIn) {
       return (
-        <Redirect to="/category" />
+        <Redirect to="dashboard/category" />
       );
     }
 
@@ -101,16 +101,16 @@ export default class UserLogin extends BasePage<{}> {
           <Card>
             <Card.Body>
               <Card.Title>
-                <b>User Login</b>
+                <b>Administrator Login</b>
               </Card.Title>
               <Card.Text as="div">
                 <Form>
                   <Form.Group>
-                    <Form.Label>E-mail:</Form.Label>
-                    <Form.Control type="email"
-                                  placeholder="Enter your e-mail here..."
-                                  value={ this.state.email }
-                                  onChange={ this.onChangeInput("email") }
+                    <Form.Label>Username:</Form.Label>
+                    <Form.Control type="text"
+                                  placeholder="Enter your username here..."
+                                  value={ this.state.username }
+                                  onChange={ this.onChangeInput("username") }
                     />
                   </Form.Group>
 
@@ -133,7 +133,7 @@ export default class UserLogin extends BasePage<{}> {
                   {
                     this.state.message
                       ? (<p className="mt-3">{ this.state.message }</p>)
-                      : ""
+                      : ''
                   }
                 </Form>
               </Card.Text>

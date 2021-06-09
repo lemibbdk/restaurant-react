@@ -39,7 +39,7 @@ export default class AuthService {
         }
       })
       .catch(err => {
-
+        EventRegister.emit("AUTH_EVENT", "user_login_failed", err);
       })
   }
 
@@ -67,5 +67,29 @@ export default class AuthService {
           });
         });
     });
+  }
+
+  public static administratorLogin(username: string, password: string) {
+    api('POST', '/auth/administrator/login', 'administrator', {
+      username,
+      password
+    }, false)
+      .then(res => {
+        console.log(res)
+        if (res.status === 'ok') {
+          const authToken = res.data?.authToken ?? '';
+          const refreshToken = res.data?.refreshToken ?? '';
+
+          saveAuthToken('administrator', authToken);
+          saveRefreshToken('administrator', refreshToken);
+
+          EventRegister.emit('AUTH_EVENT', 'administrator_login');
+        } else {
+          EventRegister.emit('AUTH_EVENT', 'administrator_login_failed', res.data);
+        }
+      })
+      .catch(err => {
+        EventRegister.emit("AUTH_EVENT", "administrator_login_failed", err);
+      })
   }
 }
