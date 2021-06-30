@@ -91,7 +91,7 @@ export default class AdministratorLogin extends BasePage<{}> {
   renderMain(): JSX.Element {
     if (this.state.isLoggedIn) {
       return (
-        <Redirect to="dashboard/category" />
+        <Redirect to="/dashboard/category" />
       );
     }
 

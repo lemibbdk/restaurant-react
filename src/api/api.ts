@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import { AppConfiguration } from '../config/app.config';
 
 type ApiMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
-type ApiRole = 'user' | 'administrator'
+export type ApiRole = 'user' | 'administrator'
 type ApiResponseStatus = 'ok' | 'error' | 'login'
 
 export interface ApiResponse {
@@ -142,4 +142,18 @@ function refreshTokenResponseHandler(res: AxiosResponse, resolve: (data: string|
   }
 
   resolve(res.data?.authToken);
+}
+
+export function isRoleLoggedIn(role: ApiRole): Promise<boolean> {
+  return new Promise<boolean>(resolve => {
+    api('GET', '/auth/' + role + '/ok', role)
+      .then(res => {
+        if (res?.data === 'OK') return resolve(true)
+
+        resolve(false);
+      })
+      .catch(() => {
+        resolve(false);
+      })
+  })
 }

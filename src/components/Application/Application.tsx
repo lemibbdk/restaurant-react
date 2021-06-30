@@ -14,6 +14,7 @@ import ItemPage from '../Item/ItemPage';
 import UserRegistration from '../User/UserRegistration';
 import AdministratorLogin from '../Administrator/AdministratorLogin';
 import AdministratorLogout from '../Administrator/AdministratorLogout';
+import CategoryDashboardList from '../Administrator/Dashboard/Category/CategoryDashboardList';
 
 class ApplicationState {
   authorizedRole: "user" | "administrator" | "visitor" = "visitor";
@@ -108,6 +109,8 @@ export default class Application extends React.Component {
 
               <Route path="/administrator/login" component={AdministratorLogin} />
               <Route path="/administrator/logout" component={AdministratorLogout} />
+
+              <Route exact path="/dashboard/category" component={CategoryDashboardList} />
             </Switch>
           </div>
           <div>

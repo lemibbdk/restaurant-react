@@ -1,11 +1,11 @@
-import api from '../api/api';
+import api, { ApiRole } from '../api/api';
 import CategoryModel from '../models/CategoryModel';
 import EventRegister from '../api/EventRegister';
 
 export default class CategoryService {
-  public static getTopLevelCategories(): Promise<CategoryModel[]> {
+  public static getTopLevelCategories(role: ApiRole = 'user'): Promise<CategoryModel[]> {
     return new Promise<CategoryModel[]>(resolve => {
-      api('GET', '/category', 'user')
+      api('GET', '/category', role)
         .then(res => {
           if (res?.status !== 'ok') {
             if (res.status === 'login') {
@@ -20,9 +20,9 @@ export default class CategoryService {
     })
   }
 
-  public static getCategoryById(categoryId: number): Promise<CategoryModel|null> {
+  public static getCategoryById(categoryId: number, role: ApiRole = 'user'): Promise<CategoryModel|null> {
     return new Promise<CategoryModel|null>(resolve => {
-      api('GET', '/category/' + categoryId, 'user')
+      api('GET', '/category/' + categoryId, role)
         .then(res => {
           if (res?.status !== 'ok') {
             if (res.status === 'login') {
