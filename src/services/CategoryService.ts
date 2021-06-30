@@ -7,6 +7,10 @@ interface IAddCategory {
   parentCategoryId: number | null;
 }
 
+interface IEditCategory {
+  name: string;
+}
+
 interface IResult {
   success: boolean;
   message?: string;
@@ -75,5 +79,35 @@ export default class CategoryService {
           })
         })
     })
+  }
+
+  public static editCategory(categoryId: number, data: IEditCategory): Promise<IResult> {
+    return new Promise<IResult>(resolve => {
+      api('PUT', '/category/' + categoryId, 'administrator', data)
+        .then(res => {
+          if (res?.status === 'error') {
+            if (Array.isArray(res?.data?.data)) {
+              const field = res?.data?.data[0]?.instancePath.replace('/', '');
+              const msg   = res?.data?.data[0]?.message;
+              const error = field + ' ' + msg;
+              return resolve({
+                success: false,
+                message: error,
+              });
+            }
+          }
+
+          if (res?.data?.errorCode === 1062) {
+            return resolve({
+              success: false,
+              message: 'A category with this name already exists.',
+            });
+          }
+
+          return resolve({
+            success: true,
+          });
+        })
+    });
   }
 }
