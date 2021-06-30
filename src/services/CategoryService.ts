@@ -2,6 +2,16 @@ import api, { ApiRole } from '../api/api';
 import CategoryModel from '../models/CategoryModel';
 import EventRegister from '../api/EventRegister';
 
+interface IAddCategory {
+  name: string;
+  parentCategoryId: number | null;
+}
+
+interface IResult {
+  success: boolean;
+  message?: string;
+}
+
 export default class CategoryService {
   public static getTopLevelCategories(role: ApiRole = 'user'): Promise<CategoryModel[]> {
     return new Promise<CategoryModel[]>(resolve => {
@@ -34,6 +44,36 @@ export default class CategoryService {
 
           resolve(res.data as CategoryModel);
         });
+    })
+  }
+
+  public static addNewCategory(data: IAddCategory): Promise<IResult> {
+    return new Promise<IResult>(resolve => {
+      api('POST', '/category', 'administrator', data)
+        .then(res => {
+          if (res?.status === 'error') {
+            if (Array.isArray(res?.data?.data)) {
+              const field = res?.data?.data[0].instancePath.replace('/', '');
+              const msg = res?.data?.data[0]?.message;
+              const error = field + ' ' + msg;
+              return resolve({
+                success: false,
+                message: error
+              })
+            }
+          }
+
+          if (res?.data?.errorCode === 1062) {
+            return resolve({
+              success: false,
+              message: 'Category with this name already exists.'
+            })
+          }
+
+          return resolve({
+            success: true
+          })
+        })
     })
   }
 }
