@@ -41,7 +41,7 @@ export default class OrderDashboardList extends BasePage<{}> {
     EventRegister.off("ORDER_EVENT", this.getOrders.bind(this));
   }
 
-  private static getLocalDate(isoDate: string): string {
+  getLocalDate(isoDate: string): string {
     const date = new Date(isoDate);
     return date.toLocaleDateString() + " " + date.toLocaleTimeString();
   }
