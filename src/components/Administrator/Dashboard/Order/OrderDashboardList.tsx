@@ -4,10 +4,12 @@ import CartService from '../../../../services/CartService';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import EventRegister from '../../../../api/EventRegister';
 import React from 'react';
+import CartPreview from './CartPreview';
 
 interface OrderDashboardListState {
   carts: CartModel[];
   cartStatusSaveButtonEnabled: Map<number, boolean>;
+  displayedCart: CartModel | null;
 }
 
 export default class OrderDashboardList extends BasePage<{}> {
@@ -19,6 +21,7 @@ export default class OrderDashboardList extends BasePage<{}> {
     this.state = {
       carts: [],
       cartStatusSaveButtonEnabled: new Map(),
+      displayedCart: null
     }
   }
 
@@ -91,6 +94,7 @@ export default class OrderDashboardList extends BasePage<{}> {
               <th>Total price</th>
               <th>User</th>
               <th>Status</th>
+              <th>Options</th>
             </tr>
           </thead>
           <tbody>
@@ -127,11 +131,27 @@ export default class OrderDashboardList extends BasePage<{}> {
                     </InputGroup.Append>
                   </InputGroup>
                 </td>
+                <td>
+                  <Button
+                    variant="primary"
+                    onClick={ () => this.setState({ displayedCart: cart }) }>
+                    Show cart
+                  </Button>
+                </td>
               </tr>
             ))
           }
           </tbody>
         </table>
+
+        {
+          this.state.displayedCart !== null
+            ? ( <CartPreview
+              cart={ this.state.displayedCart }
+              onClose={ () => this.setState({ displayedCart: null }) }
+            /> )
+            : ""
+        }
       </>
     );
   }
