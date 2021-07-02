@@ -1,6 +1,7 @@
 import ItemModel from '../models/ItemModel';
 import api from '../api/api';
 import EventRegister from '../api/EventRegister';
+import * as path from 'path';
 
 export default class ItemService {
   public static getItemById(itemId: number): Promise<ItemModel|null> {
@@ -35,5 +36,21 @@ export default class ItemService {
           resolve(res.data as ItemModel[]);
         })
     })
+  }
+
+
+
+  public static getThumbPath(url: string): string {
+    const directory = path.dirname(url);
+    const extension = path.extname(url);
+    const filename  = path.basename(url, extension);
+    return directory + '/' + filename + '-thumb' + extension;
+  }
+
+  public static getSmallPath(url: string): string {
+    const directory = path.dirname(url);
+    const extension = path.extname(url);
+    const filename  = path.basename(url, extension);
+    return directory + '/' + filename + '-small' + extension;
   }
 }
