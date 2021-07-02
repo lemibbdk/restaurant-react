@@ -1,4 +1,4 @@
-import CartModel from '../models/CartModel';
+import CartModel, { OrderStatus } from '../models/CartModel';
 import api from '../api/api';
 import { MemoizeExpiring } from 'typescript-memoize';
 import EventRegister from '../api/EventRegister';
@@ -53,6 +53,27 @@ export default class CartService {
         }
 
         EventRegister.emit('CART_EVENT', 'cart.update');
+      });
+  }
+
+  public static getAllOrders(): Promise<CartModel[]> {
+    return new Promise<CartModel[]>(resolve => {
+      api('GET', '/order', 'administrator')
+        .then(res => {
+          if (res.status !== 'ok') {
+            return resolve([]);
+          }
+          resolve(res.data);
+        })
+    });
+  }
+
+  public static setOrderStatus(cartId: number, status: OrderStatus) {
+    api('PUT', '/cart/' + cartId, 'administrator', { status })
+      .then(res => {
+        if (res.status !== 'ok') return;
+        if (res.data.errorCode !== undefined) return;
+        EventRegister.emit('ORDER_EVENT', 'order.updated', cartId);
       });
   }
 }
