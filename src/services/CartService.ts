@@ -40,8 +40,11 @@ export default class CartService {
       });
   }
 
-  public static makeOrder() {
-    api('POST', '/cart/order', 'user')
+  public static makeOrder(desiredDeliveryTime: Date, footnote: string) {
+    api('POST', '/cart/order', 'user', {
+      desiredDeliveryTime,
+      footnote
+    })
       .then(res => {
         if (res.status !== 'ok') {
           EventRegister.emit('ORDER_EVENT', 'order.failed', res.data);

@@ -1,6 +1,6 @@
 import BasePage from '../BasePage/BasePage';
 import CartModel from '../../models/CartModel';
-import { Button, Card, Form, InputGroup } from 'react-bootstrap';
+import { Button, Card, Form, FormControl, InputGroup } from 'react-bootstrap';
 import EventRegister from '../../api/EventRegister';
 import CartService from '../../services/CartService';
 import ItemService from '../../services/ItemService';
@@ -8,6 +8,7 @@ import { AppConfiguration } from '../../config/app.config';
 import './CartPage.sass';
 import React from 'react';
 import ConfirmAction from '../Misc/ConfirmAction';
+import TimePicker from 'react-time-picker';
 
 interface CartPageState {
   cart: CartModel|null;
@@ -19,6 +20,12 @@ interface CartPageState {
   showMakeOrderDialog: boolean;
   makeOrderDialogYesHandler: () => void;
   makeOrderDialogNoHandler: () => void;
+
+  desiredTime: string;
+  footnote: string;
+
+  desiredDeliveryDate: Date;
+  errorText: string;
 }
 
 export default class CartPage extends BasePage<{}> {
@@ -26,6 +33,24 @@ export default class CartPage extends BasePage<{}> {
 
   constructor(props: any) {
     super(props);
+
+    const now = new Date();
+
+    now.setMinutes(now.getMinutes() + 45);
+    let minTime;
+
+    let allowedMinutes = now.getMinutes() + '';
+    let allowedHours = now.getHours() + '';
+
+    if (Number(allowedMinutes) < 10) {
+      allowedMinutes = '0' + allowedMinutes;
+    }
+
+    if (Number(allowedHours) < 10) {
+      allowedHours = '0' + allowedHours;
+    }
+
+    minTime = allowedHours + ':' + allowedMinutes;
 
     this.state = {
       cart: null,
@@ -45,6 +70,13 @@ export default class CartPage extends BasePage<{}> {
           showMakeOrderDialog: false,
         })
       },
+
+      desiredTime: minTime,
+      footnote: '',
+
+      desiredDeliveryDate: now,
+
+      errorText: ''
     }
   }
 
@@ -125,6 +157,41 @@ export default class CartPage extends BasePage<{}> {
     };
   }
 
+  private onDesiredTimeChange(e: any) {
+    console.log(e)
+    const now = new Date();
+    const desiredHours = e === null ? '00' : Number(e.split(':')[0]);
+    const desiredMinutes = e === null ? '00' : Number(e.split(':')[1]);
+
+    const desired = new Date();
+    desired.setHours(Number(desiredHours));
+    desired.setMinutes(Number(desiredMinutes));
+
+    if (desired.getTime() - now.getTime() < (45 * 60000)) {
+      this.setState({
+        errorText: 'Delivery time cen be at least in 45 minutes.'
+      })
+    } else {
+      this.setState({
+        errorText: ''
+      })
+
+      console.log(desired)
+    }
+
+    this.setState({
+      desiredTime: e
+    })
+  }
+
+  private updateFootnoteChange(field: 'footnote'): (event: React.ChangeEvent<HTMLInputElement>) => void {
+    return (event: React.ChangeEvent<HTMLInputElement>) => {
+      this.setState({
+        [field]: event.target.value + ''
+      })
+    }
+  }
+
   private makeOrderHandler() {
     if (this.state.cart === null) return;
     if (this.state.cart.itemInfos.length === 0) return;
@@ -132,14 +199,14 @@ export default class CartPage extends BasePage<{}> {
     this.setState({
       showMakeOrderDialog: true,
       makeOrderDialogYesHandler: () => {
-        CartService.makeOrder();
+        CartService.makeOrder(this.state.desiredDeliveryDate, this.state.footnote);
         this.setState({ showMakeOrderDialog: false, });
       }
     });
   }
 
   renderMain(): JSX.Element {
-    if (this.state.cart === null) {
+    if (this.state.cart === null || this.state.cart.itemInfos.length === 0) {
       return (
         <Card>
           <Card.Header>
@@ -236,15 +303,42 @@ export default class CartPage extends BasePage<{}> {
                   </td>
                 </tr>
               )) }
+              <tr>
+                <td colSpan={3}>
+                  <InputGroup className="h-100">
+                    <InputGroup.Text>
+                      Select desired delivery time
+                    </InputGroup.Text>
+                    <TimePicker
+                      value={this.state.desiredTime}
+                      // minTime={ this.getMinTime() }
+                      maxTime="23:59"
+                      onChange={(e) => this.onDesiredTimeChange(e)}
+                    />
+                  </InputGroup>
+                  <span className="error-text">{this.state.errorText}</span>
+                </td>
+                <td colSpan={3}>
+                  <InputGroup>
+                    <InputGroup.Prepend className="d-flex">
+                      <InputGroup.Text>Footnote</InputGroup.Text>
+                    </InputGroup.Prepend>
+                    <FormControl
+                      as="textarea"
+                      aria-label="With textarea"
+                      placeholder="Insert footnote here"
+                      onChange={this.updateFootnoteChange("footnote")}
+                    />
+                  </InputGroup>
+                </td>
+              </tr>
               </tbody>
               <tfoot>
               <tr>
                 <td colSpan={4}> </td>
                 <td>
                   &euro; {
-                  this.state
-                    .cart
-                    .itemInfos
+                  this.state.cart.itemInfos
                     .map(el => el.itemInfo.price * el.quantity)
                     .reduce((sum, value) => sum + value, 0)
                     .toFixed(2)
@@ -253,8 +347,12 @@ export default class CartPage extends BasePage<{}> {
                 <td>
                   {
                     this.state.cart.itemInfos.length > 0 ? (
-                      <Button variant="primary" size="sm"
-                              onClick={ () => this.makeOrderHandler() }>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={ () => this.makeOrderHandler() }
+                        disabled={this.state.errorText.length > 0}
+                      >
                         Make order
                       </Button>
                     ): ""
