@@ -27,4 +27,29 @@ export default class CartService {
         EventRegister.emit('CART_EVENT', 'cart.add', itemInfoId, quantity);
       });
   }
+
+  public static setToCart(itemInfoId: number, newQuantity: number) {
+    api('PUT', '/cart', 'user', {
+      itemInfoId,
+      quantity: newQuantity
+    })
+      .then(res => {
+        if (res.status !== 'ok') return;
+        if (res.data.errorCode !== undefined) return;
+        EventRegister.emit('CART_EVENT', 'cart.update', itemInfoId, newQuantity);
+      });
+  }
+
+  public static makeOrder() {
+    api('POST', '/cart/order', 'user')
+      .then(res => {
+        if (res.status !== 'ok') {
+          EventRegister.emit('ORDER_EVENT', 'order.failed', res.data);
+        } else {
+          EventRegister.emit('ORDER_EVENT', 'order.success', res.data);
+        }
+
+        EventRegister.emit('CART_EVENT', 'cart.update');
+      });
+  }
 }
