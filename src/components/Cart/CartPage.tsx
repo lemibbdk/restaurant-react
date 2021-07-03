@@ -283,10 +283,10 @@ export default class CartPage extends BasePage<{}> {
                         max="100"
                         step="1"
                         value={ el.quantity }
-                        onChange={ this.onChangeQuantityInput(el.itemInfoId) } />
+                        onChange={ this.onChangeQuantityInput(el.cartItemId) } />
                       <InputGroup.Append>
                         <Button variant="primary"
-                                onClick={ this.getUpdateQuantityHandler(el.itemInfoId) }>
+                                onClick={ this.getUpdateQuantityHandler(el.cartItemId) }>
                           Update
                         </Button>
                       </InputGroup.Append>
