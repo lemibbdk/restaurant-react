@@ -19,6 +19,7 @@ import CategoryDashboardAdd from '../Administrator/Dashboard/Category/CategoryDa
 import CategoryDashboardEdit from '../Administrator/Dashboard/Category/CategoryDashboardEdit';
 import CartPage from '../Cart/CartPage';
 import OrderDashboardList from '../Administrator/Dashboard/Order/OrderDashboardList';
+import ItemDashboardList from '../Administrator/Dashboard/Item/ItemDashboardList';
 
 class ApplicationState {
   authorizedRole: "user" | "administrator" | "visitor" = "visitor";
@@ -119,6 +120,8 @@ export default class Application extends React.Component {
               <Route exact path="/dashboard/category/add" component={CategoryDashboardAdd} />
               <Route path="/dashboard/category/edit/:cid" component={CategoryDashboardEdit} />
               <Route exact path="/dashboard/order" component={OrderDashboardList} />
+              <Route exact path="/dashboard/item" component={ItemDashboardList} />
+              <Route exact path="/dashboard/item/add" component={ItemDashboardList} />
             </Switch>
           </div>
           <div>

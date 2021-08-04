@@ -43,7 +43,7 @@ export default class TopMenu extends React.Component<TopMenuProperties> {
           </Nav.Item>
 
           <Nav.Item>
-            <Link className="nav-link" to="/dashboard/items">Items</Link>
+            <Link className="nav-link" to="/dashboard/item">Items</Link>
           </Nav.Item>
 
           <Nav.Item>

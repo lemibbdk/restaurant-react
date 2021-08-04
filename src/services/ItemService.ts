@@ -1,5 +1,5 @@
 import ItemModel from '../models/ItemModel';
-import api from '../api/api';
+import api, { ApiRole } from '../api/api';
 import EventRegister from '../api/EventRegister';
 import * as path from 'path';
 
@@ -21,9 +21,9 @@ export default class ItemService {
     })
   }
 
-  public static getItemsByCategoryId(categoryId: number): Promise<ItemModel[]> {
+  public static getItemsByCategoryId(categoryId: number, role: ApiRole = 'user'): Promise<ItemModel[]> {
     return new Promise<ItemModel[]>(resolve => {
-      api('GET', '/category/all/' + categoryId + '/item', 'user')
+      api('GET', '/category/all/' + categoryId + '/item', role)
         .then(res => {
           if (res?.status !== 'ok') {
             if (res.status === 'login') {
