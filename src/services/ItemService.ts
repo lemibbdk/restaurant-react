@@ -1,7 +1,27 @@
 import ItemModel from '../models/ItemModel';
-import api, { ApiRole } from '../api/api';
+import api, { apiAsForm, ApiRole } from '../api/api';
 import EventRegister from '../api/EventRegister';
 import * as path from 'path';
+
+export interface IAddItem {
+  name: string;
+  ingredients: string;
+  itemInfoAll: IItemInfo[];
+  photos: File[];
+  categoryId: number;
+}
+
+interface IItemInfo {
+  size: string;
+  energyValue: number;
+  mass: number;
+  price: number;
+}
+
+interface IResult {
+  success: boolean;
+  message?: string;
+}
 
 export default class ItemService {
   public static getItemById(itemId: number): Promise<ItemModel|null> {
@@ -34,6 +54,44 @@ export default class ItemService {
           }
 
           resolve(res.data as ItemModel[]);
+        })
+    })
+  }
+
+  public static addNewItem(data: IAddItem): Promise<IResult> {
+    return new Promise<IResult>(resolve => {
+
+      const formData = new FormData();
+      formData.append("data", JSON.stringify({
+        name: data.name,
+        ingredients: data.ingredients,
+        itemInfoAll: data.itemInfoAll,
+        categoryId: data.categoryId
+      }))
+
+      for (let photo of data.photos) {
+        formData.append("photo", photo)
+      }
+
+      apiAsForm('POST', '/item', 'administrator', formData)
+        .then(res => {
+          if (res?.status === 'error') {
+            if (Array.isArray(res?.data?.data)) {
+              return resolve({
+                success: false,
+                message: res?.data.data[0].instancePath.replace('/', '') + ' ' + res?.data.data[0].message
+              });
+            }
+
+            return resolve({
+              success: false,
+              message: JSON.stringify(res?.data?.data)
+            });
+          }
+
+          return resolve({
+            success: true
+          })
         })
     })
   }

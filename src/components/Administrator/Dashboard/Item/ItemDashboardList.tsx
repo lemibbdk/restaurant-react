@@ -128,7 +128,7 @@ export default class ItemDashboardList extends BasePage<{}> {
 
         {
           this.state.selectedCategory?.subCategories.length === 0 ?
-            <Link className="nav-link" to="/dashboard/item/add">
+            <Link className="nav-link" to={"/dashboard/" + this.state.selectedCategory?.categoryId + "/item/add"}>
               <Button variant="primary">
                 Add category item
               </Button>
