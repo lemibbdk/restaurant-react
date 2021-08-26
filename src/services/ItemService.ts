@@ -6,13 +6,26 @@ import * as path from 'path';
 export interface IAddItem {
   name: string;
   ingredients: string;
-  itemInfoAll: IItemInfo[];
+  itemInfoAll: IItemInfoAdd[];
   photos: File[];
   categoryId: number;
 }
 
-interface IItemInfo {
+export interface IEditItem {
+  name: string;
+  ingredients: string;
+  itemInfoAll: IItemInfoEdit[];
+}
+
+interface IItemInfoAdd {
   size: string;
+  energyValue: number;
+  mass: number;
+  price: number;
+}
+
+interface IItemInfoEdit {
+  itemInfoId: number|null;
   energyValue: number;
   mass: number;
   price: number;
@@ -24,9 +37,9 @@ interface IResult {
 }
 
 export default class ItemService {
-  public static getItemById(itemId: number): Promise<ItemModel|null> {
+  public static getItemById(itemId: number, role: ApiRole = 'user'): Promise<ItemModel|null> {
     return new Promise<ItemModel|null>(resolve => {
-      api('GET', '/item/' + itemId, 'user')
+      api('GET', '/item/' + itemId, role)
         .then(res => {
           if (res?.status !== 'ok') {
             if (res.status === 'login') {
@@ -96,7 +109,30 @@ export default class ItemService {
     })
   }
 
+  public static editItem(itemId: number, data: IEditItem): Promise<IResult> {
+    return new Promise<IResult>(resolve => {
+      api('PUT', '/item/' + itemId, 'administrator', data)
+        .then(res => {
+          if (res?.status === 'error') {
+            if (Array.isArray(res?.data?.data)) {
+              return resolve({
+                success: false,
+                message: res?.data.data[0].instancePath.replace('/', '') + ' ' + res?.data.data[0].message
+              });
+            }
 
+            return resolve({
+              success: false,
+              message: JSON.stringify(res?.data?.data)
+            });
+          }
+
+          return resolve({
+            success: true
+          })
+        })
+    })
+  }
 
   public static getThumbPath(url: string): string {
     const directory = path.dirname(url);

@@ -21,6 +21,7 @@ import CartPage from '../Cart/CartPage';
 import OrderDashboardList from '../Administrator/Dashboard/Order/OrderDashboardList';
 import ItemDashboardList from '../Administrator/Dashboard/Item/ItemDashboardList';
 import ItemDashboardAdd from '../Administrator/Dashboard/Item/ItemDashboardAdd';
+import ItemDashboardEdit from '../Administrator/Dashboard/Item/ItemDashboardEdit';
 
 class ApplicationState {
   authorizedRole: "user" | "administrator" | "visitor" = "visitor";
@@ -123,6 +124,7 @@ export default class Application extends React.Component {
               <Route exact path="/dashboard/order" component={OrderDashboardList} />
               <Route exact path="/dashboard/item" component={ItemDashboardList} />
               <Route exact path="/dashboard/:cid/item/add" component={ItemDashboardAdd} />
+              <Route exact path="/dashboard/:cid/item/edit/:iid" component={ItemDashboardEdit} />
             </Switch>
           </div>
           <div>
