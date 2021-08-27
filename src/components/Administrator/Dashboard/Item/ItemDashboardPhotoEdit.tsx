@@ -5,6 +5,7 @@ import EventRegister from '../../../../api/EventRegister';
 import ItemService from '../../../../services/ItemService';
 import { AppConfiguration } from '../../../../config/app.config';
 import { Button, Form } from 'react-bootstrap';
+import React from 'react';
 
 class ItemDashboardPhotoEditProperties extends BasePageProperties {
   match?: {

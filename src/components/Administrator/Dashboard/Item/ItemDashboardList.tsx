@@ -34,15 +34,6 @@ export default class ItemDashboardList extends BasePage<{}> {
     }
   }
 
-  // getCategoryById(id: number) {
-  //   CategoryService.getCategoryById(id)
-  //     .then(res => {
-  //       this.setState({
-  //         selectedCategory: res
-  //       });
-  //     })
-  // }
-
   componentDidMount() {
     this.getAllCategories();
   }
@@ -63,6 +54,7 @@ export default class ItemDashboardList extends BasePage<{}> {
       return  this.setState({
         message: 'Please select category to show items',
         forms: [],
+        items: [],
         selectedCategory: null
       })
     }
@@ -71,15 +63,20 @@ export default class ItemDashboardList extends BasePage<{}> {
 
     CategoryService.getCategoryById(Number(event.target.value), 'administrator')
       .then(res => {
+        if (!res) {
+          return this.setState({message: 'Something wrong'});
+        }
+
         this.setState({selectedCategory: res})
         if (res?.subCategories.length === 0) {
           this.getItemsByCategoryId(res.categoryId)
-
-          return this.setState({ selectedLowLevelCategory: res })
+          if(!res.parentCategoryId) {
+            this.setState({forms: this.state.forms.splice(0, (res?.subCategories.length-1))});
+          }
+        } else {
+          this.setState({forms: []});
+          this.setState({forms: this.state.forms.splice(res?.subCategories.length).concat(this.createNewForm(res))})
         }
-
-        // this.setState((prevState: ItemDashboardListState) => ({forms: prevState.forms.concat([this.newForm(res)])}))
-        this.setState({forms: this.state.forms.concat(this.createNewForm(res))})
       })
 
   }
@@ -88,7 +85,8 @@ export default class ItemDashboardList extends BasePage<{}> {
     if (cid !== undefined) {
       ItemService.getItemsByCategoryId(cid, 'administrator')
         .then(items => {
-          items.length === 0 ? this.setState({ items: [], forms: [] }) : this.setState({ items })
+          console.log(items)
+          items.length === 0 ? this.setState({ items: [] }) : this.setState({ items })
         })
     }
   }
@@ -139,13 +137,13 @@ export default class ItemDashboardList extends BasePage<{}> {
         <h1>Category items</h1>
         <table className="table table-sm">
           <thead>
-            <tr>
-              <th>Photo</th>
-              <th>#ID</th>
-              <th>Name</th>
-              <th>Ingredients</th>
-              <th>Options</th>
-            </tr>
+          <tr>
+            <th>Photo</th>
+            <th>#ID</th>
+            <th>Name</th>
+            <th>Ingredients</th>
+            <th>Options</th>
+          </tr>
           </thead>
           <tbody>
           {
