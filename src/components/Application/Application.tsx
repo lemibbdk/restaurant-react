@@ -24,6 +24,7 @@ import ItemDashboardAdd from '../Administrator/Dashboard/Item/ItemDashboardAdd';
 import ItemDashboardEdit from '../Administrator/Dashboard/Item/ItemDashboardEdit';
 import ItemDashboardPhotoEdit from '../Administrator/Dashboard/Item/ItemDashboardPhotoEdit';
 import UserDashboardList from '../Administrator/Dashboard/User/UserDashboardList';
+import AdministratorDashboardList from '../Administrator/Dashboard/Administrator/AdministratorDashboardList';
 
 class ApplicationState {
   authorizedRole: "user" | "administrator" | "visitor" = "visitor";
@@ -129,6 +130,7 @@ export default class Application extends React.Component {
               <Route exact path="/dashboard/:cid/item/edit/:iid" component={ItemDashboardEdit} />
               <Route exact path="/dashboard/:cid/item/edit/:iid/photo" component={ItemDashboardPhotoEdit} />
               <Route exact path="/dashboard/user" component={UserDashboardList} />
+              <Route exact path="/dashboard/administrator" component={AdministratorDashboardList} />
             </Switch>
           </div>
           <div>
