@@ -5,6 +5,7 @@ import { Button, Form, InputGroup } from 'react-bootstrap';
 import EventRegister from '../../../../api/EventRegister';
 import React from 'react';
 import CartPreview from './CartPreview';
+import { isRoleLoggedIn } from '../../../../api/api';
 
 interface OrderDashboardListState {
   carts: CartModel[];
@@ -35,6 +36,11 @@ export default class OrderDashboardList extends BasePage<{}> {
   }
 
   componentDidMount() {
+    isRoleLoggedIn('administrator')
+      .then(result => {
+        if (!result) return EventRegister.emit('AUTH_EVENT', 'force_login');
+      })
+
     this.getOrders();
 
     EventRegister.on("ORDER_EVENT", this.getOrders.bind(this));
