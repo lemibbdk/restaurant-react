@@ -165,6 +165,11 @@ export default class ItemDashboardList extends BasePage<{}> {
                       Edit item
                     </Button>
                   </Link>
+                  <Link className="nav-link" to={"/dashboard/" + this.state.selectedCategory?.categoryId + "/item/edit/" + el.itemId + '/photo'}>
+                    <Button variant="primary">
+                      Edit photo
+                    </Button>
+                  </Link>
                 </td>
               </tr>
             ))

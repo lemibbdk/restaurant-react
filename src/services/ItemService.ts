@@ -134,6 +134,66 @@ export default class ItemService {
     })
   }
 
+  public static addPhotos(itemId: number, photos: FileList): Promise<IResult> {
+    return new Promise<IResult>(resolve => {
+
+      for (let i = 0; i < photos.length; i++) {
+        const formData = new FormData();
+        formData.append( 'photo'+i, photos[i]);
+
+        apiAsForm('POST', '/item/' + itemId + '/photo', 'administrator', formData)
+          .then(res => {
+            console.log(res)
+            if (res?.status === 'error') {
+              if (Array.isArray(res?.data?.data)) {
+                return resolve({
+                  success: false,
+                  message: res?.data.data[0].instancePath.replace('/', '') + ' ' + res?.data.data[0].message
+                });
+              }
+
+              return resolve({
+                success: false,
+                message: JSON.stringify(res?.data?.data)
+              });
+            }
+
+            return resolve({
+              success: true
+            })
+          })
+      }
+
+    })
+  }
+
+  public static deletePhotos(itemId: number, photoIds: []): Promise<IResult> {
+    return new Promise<IResult>(resolve => {
+      for (let photoId of photoIds) {
+        api('DELETE', 'item/' + itemId + '/photo/' + photoId, 'administrator')
+          .then(res => {
+            if (res?.status === 'error') {
+              if (Array.isArray(res?.data?.data)) {
+                return resolve({
+                  success: false,
+                  message: res?.data.data[0].instancePath.replace('/', '') + ' ' + res?.data.data[0].message
+                });
+              }
+
+              return resolve({
+                success: false,
+                message: JSON.stringify(res?.data?.data)
+              });
+            }
+
+            return resolve({
+              success: true
+            })
+          })
+      }
+    })
+  }
+
   public static getThumbPath(url: string): string {
     const directory = path.dirname(url);
     const extension = path.extname(url);
