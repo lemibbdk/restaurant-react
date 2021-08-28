@@ -25,6 +25,7 @@ import ItemDashboardEdit from '../Administrator/Dashboard/Item/ItemDashboardEdit
 import ItemDashboardPhotoEdit from '../Administrator/Dashboard/Item/ItemDashboardPhotoEdit';
 import UserDashboardList from '../Administrator/Dashboard/User/UserDashboardList';
 import AdministratorDashboardList from '../Administrator/Dashboard/Administrator/AdministratorDashboardList';
+import UserProfile from '../User/UserProfile';
 
 class ApplicationState {
   authorizedRole: "user" | "administrator" | "visitor" = "visitor";
@@ -109,14 +110,12 @@ export default class Application extends React.Component {
                 <ContactPage title="Our location in Belgrade" phone="+381 11 462 44 75" address="Sarajevska 14" />
               </Route>
 
-              <Route path="/profile">
-                My profile
-              </Route>
 
               <Route path="/user/register" component={UserRegistration} />
               <Route path="/user/login" component={UserLogin} />
               <Route path="/user/logout" component={UserLogout} />
               <Route exact path="/cart" component={CartPage} />
+              <Route path="/profile" component={UserProfile} />
 
               <Route path="/administrator/login" component={AdministratorLogin} />
               <Route path="/administrator/logout" component={AdministratorLogout} />

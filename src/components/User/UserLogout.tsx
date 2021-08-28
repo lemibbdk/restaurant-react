@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import { saveAuthToken, saveRefreshToken } from '../../api/api';
+import { saveAuthToken, saveIdentity, saveRefreshToken } from '../../api/api';
 import EventRegister from '../../api/EventRegister';
 
 class UserLogoutState {
@@ -21,6 +21,7 @@ export default class UserLogout extends Component {
   componentDidMount() {
     saveAuthToken('user', '');
     saveRefreshToken('user', '');
+    saveIdentity('user', '');
 
     this.setState({
       logoutDone: true

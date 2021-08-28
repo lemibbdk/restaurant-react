@@ -1,4 +1,4 @@
-import api, { saveAuthToken, saveRefreshToken } from '../api/api';
+import api, { saveAuthToken, saveIdentity, saveRefreshToken } from '../api/api';
 import EventRegister from '../api/EventRegister';
 
 export interface IPostalAddressData {
@@ -32,6 +32,19 @@ export default class AuthService {
 
           saveAuthToken('user', authToken);
           saveRefreshToken('user', refreshToken);
+
+          const parseJwt = (token: string) => {
+            try {
+              return JSON.parse(atob(token.split('.')[1]));
+            } catch (e) {
+              return null;
+            }
+          };
+
+          const identity = parseJwt(authToken).id + '';
+          console.log(identity)
+
+          saveIdentity('user', identity);
 
           EventRegister.emit('AUTH_EVENT', 'user_login');
         } else {
