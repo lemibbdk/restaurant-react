@@ -5,7 +5,6 @@ import TopMenu from '../TopMenu/TopMenu';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import HomePage from '../HomePage/HomePage';
 import CategoryPage from '../CategoryPage/CategoryPage';
-import ContactPage from '../ContactPage/ContactPage';
 import EventRegister from '../../api/EventRegister';
 import api from '../../api/api';
 import UserLogin from '../User/UserLogin';
@@ -105,11 +104,6 @@ export default class Application extends React.Component {
               />
 
               <Route path="/item/:iid" component={ItemPage} />
-
-              <Route path="/contact">
-                <ContactPage title="Our location in Belgrade" phone="+381 11 462 44 75" address="Sarajevska 14" />
-              </Route>
-
 
               <Route path="/user/register" component={UserRegistration} />
               <Route path="/user/login" component={UserLogin} />
