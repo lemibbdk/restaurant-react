@@ -9,6 +9,9 @@ import './CartPage.sass';
 import React from 'react';
 import ConfirmAction from '../Misc/ConfirmAction';
 import TimePicker from 'react-time-picker';
+import { getIdentity } from '../../api/api';
+import UserService from '../../services/UserService';
+import PostalAddressModel from '../../models/PostalAddressModel';
 
 interface CartPageState {
   cart: CartModel|null;
@@ -21,6 +24,8 @@ interface CartPageState {
   makeOrderDialogYesHandler: () => void;
   makeOrderDialogNoHandler: () => void;
 
+  userAddresses: PostalAddressModel[];
+  selectedAddress: number,
   desiredTime: string;
   footnote: string;
 
@@ -71,6 +76,8 @@ export default class CartPage extends BasePage<{}> {
         })
       },
 
+      userAddresses: [],
+      selectedAddress: 0,
       desiredTime: minTime,
       footnote: '',
 
@@ -83,14 +90,36 @@ export default class CartPage extends BasePage<{}> {
   private getCartData() {
     CartService.getCart()
       .then(res => {
+        if (!res) {
+          return this.setState({
+            errorText: 'Something wrong'
+          })
+        }
+
         this.setState({
           cart: res
         })
       })
   }
 
+  private getUserData() {
+    const userId = getIdentity('user');
+    UserService.getById(+(userId))
+      .then(res => {
+        if (res === null) {
+          return this.setState({errorText: 'Something wrong to get user data'})
+        }
+
+        this.setState({
+          userAddresses: res.postalAddresses,
+          selectedAddress: res.postalAddresses[0].postalAddressId
+        });
+      })
+  }
+
   componentDidMount() {
     this.getCartData();
+    this.getUserData();
     EventRegister.on('CART_EVENT', this.getCartData.bind(this));
   }
 
@@ -199,8 +228,16 @@ export default class CartPage extends BasePage<{}> {
     this.setState({
       showMakeOrderDialog: true,
       makeOrderDialogYesHandler: () => {
-        CartService.makeOrder(this.state.desiredDeliveryDate, this.state.footnote);
-        this.setState({ showMakeOrderDialog: false, });
+        CartService.makeOrder(this.state.desiredDeliveryDate, this.state.footnote, this.state.selectedAddress)
+          .then(res => {
+            if (!res.success) {
+              this.setState({ errorText: res.message })
+            }
+          })
+        this.setState({
+          showMakeOrderDialog: false,
+          cart: null
+        });
       }
     });
   }
@@ -303,6 +340,27 @@ export default class CartPage extends BasePage<{}> {
                   </td>
                 </tr>
               )) }
+              <tr>
+                <td colSpan={3}>
+                  <InputGroup className="h-100">
+                    <InputGroup.Text>
+                      Select delivery address
+                    </InputGroup.Text>
+                    <Form.Control
+                      as="select"
+                      value={ this.state.selectedAddress }
+                      onChange={ this.setState }
+                    >
+                      {
+                        this.state.userAddresses.map((el) => (
+                          <option key={el.postalAddressId} value={el.postalAddressId}> { el.address } </option>
+                        ))
+                      }
+
+                    </Form.Control>
+                  </InputGroup>
+                </td>
+              </tr>
               <tr>
                 <td colSpan={3}>
                   <InputGroup className="h-100">
