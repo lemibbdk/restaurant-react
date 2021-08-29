@@ -76,7 +76,7 @@ export default class OrderDashboardList extends BasePage<{}> {
 
   private setNewOrderStatus(cartId: number) {
     const status = this.state.carts.find(c => c.cartId === cartId)?.order?.status as OrderStatus;
-    CartService.setOrderStatus(cartId, status);
+    CartService.setOrderStatus(cartId, status, 'administrator');
 
     this.setState((state:OrderDashboardListState) => {
       state.cartStatusSaveButtonEnabled.set(cartId, false);

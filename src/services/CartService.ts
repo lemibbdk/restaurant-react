@@ -1,7 +1,12 @@
 import CartModel, { OrderStatus } from '../models/CartModel';
-import api from '../api/api';
+import api, { ApiRole } from '../api/api';
 import { MemoizeExpiring } from 'typescript-memoize';
 import EventRegister from '../api/EventRegister';
+
+interface IResult {
+  success: boolean;
+  message?: string;
+}
 
 export default class CartService {
   @MemoizeExpiring(2000)
@@ -40,20 +45,40 @@ export default class CartService {
       });
   }
 
-  public static makeOrder(desiredDeliveryTime: Date, footnote: string) {
-    api('POST', '/cart/order', 'user', {
-      desiredDeliveryTime,
-      footnote
-    })
-      .then(res => {
-        if (res.status !== 'ok') {
-          EventRegister.emit('ORDER_EVENT', 'order.failed', res.data);
-        } else {
-          EventRegister.emit('ORDER_EVENT', 'order.success', res.data);
-        }
+  public static makeOrder(desiredDeliveryTime: Date, footnote: string, addressId: number): Promise<IResult> {
+    return new Promise<IResult>(resolve => {
+      api('POST', '/cart/order', 'user', {
+        desiredDeliveryTime,
+        footnote,
+        addressId
+      })
+        .then(res => {
+          if (res.status !== 'ok') {
+            if (Array.isArray(res?.data?.data)) {
+              const field = res?.data?.data[0]?.instancePath.replace('/', '');
+              const msg   = res?.data?.data[0]?.message;
+              const error = field + ' ' + msg;
+              EventRegister.emit('ORDER_EVENT', 'order.failed', res.data);
+              return resolve({
+                success: false,
+                message: error,
+              });
+            }
 
-        EventRegister.emit('CART_EVENT', 'cart.update');
-      });
+            EventRegister.emit('ORDER_EVENT', 'order.failed', res.data);
+            resolve({success: false})
+          } else {
+            resolve({
+              success: true,
+              message: ''
+            })
+            EventRegister.emit('ORDER_EVENT', 'order.success', res.data);
+          }
+
+          EventRegister.emit('CART_EVENT', 'cart.update');
+          resolve(res.data)
+        });
+    })
   }
 
   public static getAllOrders(): Promise<CartModel[]> {
@@ -68,12 +93,25 @@ export default class CartService {
     });
   }
 
-  public static setOrderStatus(cartId: number, status: OrderStatus) {
-    api('PUT', '/cart/' + cartId, 'administrator', { status })
+  public static setOrderStatus(cartId: number, status: OrderStatus, role: ApiRole) {
+    api('PUT', '/cart/' + cartId, role, { status })
       .then(res => {
         if (res.status !== 'ok') return;
         if (res.data.errorCode !== undefined) return;
         EventRegister.emit('ORDER_EVENT', 'order.updated', cartId);
       });
+  }
+
+  public static getUserOrders(): Promise<CartModel[]> {
+    return new Promise<CartModel[]>(resolve => {
+      api('GET', '/cart/order/my', 'user')
+        .then(res => {
+          if (res.status !== 'ok') {
+            return resolve([])
+          }
+
+          resolve(res.data);
+        })
+    })
   }
 }
