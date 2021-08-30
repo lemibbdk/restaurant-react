@@ -4,6 +4,8 @@ import React from 'react';
 import { isRoleLoggedIn } from '../../../../api/api';
 import EventRegister from '../../../../api/EventRegister';
 import AdministratorService from '../../../../services/AdministratorService';
+import { Link } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 
 interface AdministratorDashboardListState {
   administrators: AdministratorModel[];
@@ -42,6 +44,11 @@ export default class AdministratorDashboardList extends BasePage<{}> {
     return (
       <>
         <h1>Administrators</h1>
+        <Link className="nav-link" to="/dashboard/administrator/add">
+          <Button variant="primary">
+            Add administrator
+          </Button>
+        </Link>
         <table className="table table-sm">
           <thead>
           <tr>
