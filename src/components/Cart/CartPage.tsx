@@ -12,6 +12,7 @@ import TimePicker from 'react-time-picker';
 import { getIdentity } from '../../api/api';
 import UserService from '../../services/UserService';
 import PostalAddressModel from '../../models/PostalAddressModel';
+import { Redirect } from 'react-router-dom';
 
 class CartPageProperties extends BasePageProperties {
   match?: {
@@ -41,6 +42,8 @@ interface CartPageState {
 
   desiredDeliveryDate: Date;
   errorText: string;
+
+  redirectBackToOrders: boolean
 }
 
 export default class CartPage extends BasePage<CartPageProperties> {
@@ -95,7 +98,9 @@ export default class CartPage extends BasePage<CartPageProperties> {
 
       desiredDeliveryDate: now,
 
-      errorText: ''
+      errorText: '',
+
+      redirectBackToOrders: false
     }
   }
 
@@ -144,7 +149,8 @@ export default class CartPage extends BasePage<CartPageProperties> {
             console.log(el)
             this.setState({
               cart: el,
-              editing: true
+              editing: true,
+              footnote: el.order.footnote
             })
           }
         })
@@ -282,40 +288,44 @@ export default class CartPage extends BasePage<CartPageProperties> {
     if (this.state.cart === null) return;
     if (this.state.cart.itemInfos.length === 0) return;
 
-    if (this.state.editing) {
-      this.setState({
-        showMakeOrderDialog: true,
-        makeOrderDialogYesHandler: () => {
-          if (this.state.cart && this.state.cart.order) {
-            const data = {
-              cartId: this.state.cart.cartId,
-              itemInfos: this.state.cart.itemInfos,
-              order: {
-                postalAddressId: this.state.selectedAddress,
-                desiredDeliveryTime: this.state.desiredDeliveryDate,
-                footnote: this.state.footnote
-              }
+    this.setState({
+      showMakeOrderDialog: true,
+      makeOrderDialogYesHandler: () => {
+        if (this.state.cart && this.state.cart.order) {
+          const data = {
+            cartId: this.state.cart.cartId,
+            itemInfos: this.state.cart.itemInfos,
+            order: {
+              orderId: this.state.cart.order.orderId,
+              addressId: this.state.selectedAddress,
+              desiredDeliveryTime: this.state.desiredDeliveryDate,
+              footnote: this.state.footnote
             }
-
-            CartService.editCart(this.state.cart.cartId, data)
-              .then(res => {
-                console.log(res)
-                if (!res.success) {
-                  return this.setState({
-                    errorText: res.message
-                  })
-                }
-              })
-            this.setState({
-              showMakeOrderDialog: false
-            });
           }
+
+          CartService.editCart(this.state.cart.cartId, data)
+            .then(res => {
+              console.log(res)
+              if (!res.success) {
+                return this.setState({
+                  errorText: res.message
+                })
+              }
+        this.setState({redirectBackToOrders: true})
+            })
+          this.setState({
+            showMakeOrderDialog: false
+          });
         }
-      });
-    }
+      }
+    });
   }
 
   renderMain(): JSX.Element {
+    if (this.state.redirectBackToOrders) {
+      return ( <Redirect to="/order" /> );
+    }
+
     if (this.state.cart === null || this.state.cart.itemInfos.length === 0) {
       return (
         <Card>
@@ -471,6 +481,7 @@ export default class CartPage extends BasePage<CartPageProperties> {
                       as="textarea"
                       aria-label="With textarea"
                       placeholder="Insert footnote here"
+                      value={this.state.footnote}
                       onChange={this.updateFootnoteChange("footnote")}
                     />
                   </InputGroup>

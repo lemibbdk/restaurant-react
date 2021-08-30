@@ -10,7 +10,8 @@ interface IEditCart {
 }
 
 interface IEditOrder {
-  postalAddressId: number;
+  orderId: number;
+  addressId: number;
   desiredDeliveryTime: Date;
   footnote: string;
 }
