@@ -55,6 +55,7 @@ export default class AdministratorDashboardList extends BasePage<{}> {
             <th>Username</th>
             <th>#ID</th>
             <th>Active</th>
+            <th>Options</th>
           </tr>
           </thead>
           <tbody>
@@ -64,6 +65,13 @@ export default class AdministratorDashboardList extends BasePage<{}> {
                 <td> { el.username } </td>
                 <td>{ el.administratorId }</td>
                 <td>{ el.isActive ? 'True' : 'Else' }</td>
+                <td>
+                  <Link className="nav-link" to={"/dashboard/administrator/" + el.administratorId + "/edit"}>
+                    <Button variant="primary">
+                      Edit
+                    </Button>
+                  </Link>
+                </td>
               </tr>
             ))
           }

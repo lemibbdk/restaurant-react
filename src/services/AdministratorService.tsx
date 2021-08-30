@@ -7,6 +7,10 @@ interface IAdministratorAdd {
   password: string;
 }
 
+interface IAdministratorEdit {
+  password: string
+}
+
 export default class AdministratorService {
   public static getAdministrators(): Promise<AdministratorModel[]|null> {
     return new Promise<AdministratorModel[]|null>(resolve => {
@@ -25,6 +29,23 @@ export default class AdministratorService {
     })
   }
 
+  public static getById(administratorId: number): Promise<AdministratorModel|null> {
+    return new Promise<AdministratorModel|null>(resolve => {
+      api('GET', '/administrator/' + administratorId, 'administrator')
+        .then(res => {
+          if (res?.status !== 'ok') {
+            if (res.status === 'login') {
+              EventRegister.emit('AUTH_EVENT', 'force_login');
+            }
+
+            return resolve(null);
+          }
+
+          resolve(res.data as AdministratorModel);
+        })
+    })
+  }
+
   public static addAdministrator(data: IAdministratorAdd): Promise<AdministratorModel|null> {
     return new Promise<AdministratorModel|null> (resolve => {
       api('POST', '/administrator', 'administrator', data)
@@ -38,6 +59,20 @@ export default class AdministratorService {
           }
 
           resolve(res.data as AdministratorModel);
+        })
+    })
+  }
+
+  public static editAdministrator(administratorId: number, data: IAdministratorEdit): Promise<AdministratorModel|null> {
+    return new Promise<AdministratorModel|null> (resolve => {
+      api('PUT', 'administrator/' + administratorId, 'administrator', data)
+        .then(res => {
+          console.log(res)
+          if (res?.status !== 'ok') {
+            return resolve(null)
+          }
+
+          resolve(res.data as AdministratorModel)
         })
     })
   }

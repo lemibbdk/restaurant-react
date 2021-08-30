@@ -127,6 +127,7 @@ export default class Application extends React.Component {
               <Route exact path="/dashboard/user" component={UserDashboardList} />
               <Route exact path="/dashboard/administrator" component={AdministratorDashboardList} />
               <Route exact path="/dashboard/administrator/add" component={AdministratorDashboardAdd} />
+              <Route exact path="/dashboard/administrator/:aid/edit" component={AdministratorDashboardAdd} />
 
               <Route exact path="/order" component={OrderList} />
               <Route exact path="/cart/:cid/edit" component={CartPage} />
