@@ -6,6 +6,7 @@ import CartService from '../../services/CartService';
 import { Button } from 'react-bootstrap';
 import CartPreview from '../Administrator/Dashboard/Order/CartPreview';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 interface OrderListState {
   carts: CartModel[];
@@ -100,12 +101,15 @@ export default class OrderList extends BasePage<{}> {
                     onClick={ () => this.cancelOrder(cart.cartId) } >
                     Cancel order
                   </Button>
-                  <Button
-                    className="ms-2"
-                    variant="primary"
-                    onClick={ () => this.setState({ displayedCart: cart }) }>
-                    Show cart
-                  </Button>
+                  <Link className={ cart.order?.status !== 'pending' ?  "nav-link pe-none" : "nav-link"}
+                        to={"/cart/" + cart.cartId + "/edit" }>
+                    <Button
+                      className="ms-2"
+                      variant="primary"
+                      disabled={ cart.order?.status !== 'pending' } >
+                      Edit
+                    </Button>
+                  </Link>
                 </td>
               </tr>
             ))

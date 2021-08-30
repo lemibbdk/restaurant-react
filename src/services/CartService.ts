@@ -1,7 +1,19 @@
-import CartModel, { OrderStatus } from '../models/CartModel';
+import CartModel, { CartItemModel, OrderStatus } from '../models/CartModel';
 import api, { ApiRole } from '../api/api';
 import { MemoizeExpiring } from 'typescript-memoize';
 import EventRegister from '../api/EventRegister';
+
+interface IEditCart {
+  cartId: number;
+  itemInfos: CartItemModel[];
+  order: IEditOrder;
+}
+
+interface IEditOrder {
+  postalAddressId: number;
+  desiredDeliveryTime: Date;
+  footnote: string;
+}
 
 interface IResult {
   success: boolean;
@@ -78,6 +90,33 @@ export default class CartService {
           EventRegister.emit('CART_EVENT', 'cart.update');
           resolve(res.data)
         });
+    })
+  }
+
+  public static editCart(cartId: number, data: IEditCart): Promise<IResult> {
+    return new Promise<IResult>(resolve => {
+      console.log(data)
+      api('PUT', '/cart/' + cartId + '/edit', 'user', data)
+        .then(res => {
+          if (res.status === 'error') {
+            console.log(res)
+            if (Array.isArray(res?.data?.data)) {
+              return resolve({
+                success: false,
+                message: res?.data.data[0].instancePath.replace('/', '') + ' ' + res?.data.data[0].message
+              });
+            }
+
+            return resolve({
+              success: false,
+              message: JSON.stringify(res?.data?.data)
+            });
+          }
+
+          resolve({
+            success: true
+          })
+        })
     })
   }
 

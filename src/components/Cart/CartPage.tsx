@@ -1,4 +1,4 @@
-import BasePage from '../BasePage/BasePage';
+import BasePage, { BasePageProperties } from '../BasePage/BasePage';
 import CartModel from '../../models/CartModel';
 import { Button, Card, Form, FormControl, InputGroup } from 'react-bootstrap';
 import EventRegister from '../../api/EventRegister';
@@ -12,6 +12,14 @@ import TimePicker from 'react-time-picker';
 import { getIdentity } from '../../api/api';
 import UserService from '../../services/UserService';
 import PostalAddressModel from '../../models/PostalAddressModel';
+
+class CartPageProperties extends BasePageProperties {
+  match?: {
+    params: {
+      cid: string
+    }
+  }
+}
 
 interface CartPageState {
   cart: CartModel|null;
@@ -29,11 +37,13 @@ interface CartPageState {
   desiredTime: string;
   footnote: string;
 
+  editing: boolean,
+
   desiredDeliveryDate: Date;
   errorText: string;
 }
 
-export default class CartPage extends BasePage<{}> {
+export default class CartPage extends BasePage<CartPageProperties> {
   state: CartPageState;
 
   constructor(props: any) {
@@ -81,6 +91,8 @@ export default class CartPage extends BasePage<{}> {
       desiredTime: minTime,
       footnote: '',
 
+      editing: false,
+
       desiredDeliveryDate: now,
 
       errorText: ''
@@ -117,9 +129,33 @@ export default class CartPage extends BasePage<{}> {
       })
   }
 
+  private getCartEditId(): number|null {
+    const cid = this.props.match?.params.cid;
+
+    return cid ? +(cid) : null;
+  }
+
+  private getEditCart() {
+    CartService.getUserOrders()
+      .then(res => {
+        res.forEach(el => {
+          if (el.cartId === this.getCartEditId()) {
+            if (el.order?.status !== 'pending') return this.setState({errorText: "You can't edit this cart"})
+            console.log(el)
+            this.setState({
+              cart: el,
+              editing: true
+            })
+          }
+        })
+      })
+  }
+
   componentDidMount() {
-    this.getCartData();
     this.getUserData();
+
+    if (this.getCartEditId()) return this.getEditCart()
+
     EventRegister.on('CART_EVENT', this.getCartData.bind(this));
   }
 
@@ -242,6 +278,43 @@ export default class CartPage extends BasePage<{}> {
     });
   }
 
+  private editOrderHandler() {
+    if (this.state.cart === null) return;
+    if (this.state.cart.itemInfos.length === 0) return;
+
+    if (this.state.editing) {
+      this.setState({
+        showMakeOrderDialog: true,
+        makeOrderDialogYesHandler: () => {
+          if (this.state.cart && this.state.cart.order) {
+            const data = {
+              cartId: this.state.cart.cartId,
+              itemInfos: this.state.cart.itemInfos,
+              order: {
+                postalAddressId: this.state.selectedAddress,
+                desiredDeliveryTime: this.state.desiredDeliveryDate,
+                footnote: this.state.footnote
+              }
+            }
+
+            CartService.editCart(this.state.cart.cartId, data)
+              .then(res => {
+                console.log(res)
+                if (!res.success) {
+                  return this.setState({
+                    errorText: res.message
+                  })
+                }
+              })
+            this.setState({
+              showMakeOrderDialog: false
+            });
+          }
+        }
+      });
+    }
+  }
+
   renderMain(): JSX.Element {
     if (this.state.cart === null || this.state.cart.itemInfos.length === 0) {
       return (
@@ -252,7 +325,15 @@ export default class CartPage extends BasePage<{}> {
             </Card.Title>
           </Card.Header>
           <Card.Body>
-            <p>Your shopping cart is empty.</p>
+
+            {
+              this.state.errorText === 'You can\'t edit this cart' ?
+                <b>{this.state.errorText}</b>
+                :
+                <p>Your shopping cart is empty.</p>
+            }
+
+
           </Card.Body>
         </Card>
       )
@@ -322,10 +403,15 @@ export default class CartPage extends BasePage<{}> {
                         value={ el.quantity }
                         onChange={ this.onChangeQuantityInput(el.cartItemId) } />
                       <InputGroup.Append>
-                        <Button variant="primary"
-                                onClick={ this.getUpdateQuantityHandler(el.cartItemId) }>
-                          Update
-                        </Button>
+                        {
+                          !this.state.editing ?
+                            <Button variant="primary"
+                                    onClick={ this.getUpdateQuantityHandler(el.cartItemId) }>
+                              Update
+                            </Button>
+                            :
+                            ""
+                        }
                       </InputGroup.Append>
                     </InputGroup>
                   </td>
@@ -404,7 +490,7 @@ export default class CartPage extends BasePage<{}> {
                 </td>
                 <td>
                   {
-                    this.state.cart.itemInfos.length > 0 ? (
+                    this.state.cart.itemInfos.length > 0 && !this.state.editing ? (
                       <Button
                         variant="primary"
                         size="sm"
@@ -413,7 +499,16 @@ export default class CartPage extends BasePage<{}> {
                       >
                         Make order
                       </Button>
-                    ): ""
+                    ): this.state.cart.itemInfos.length > 0 && this.state.editing ? (
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={ () => this.editOrderHandler() }
+                        disabled={this.state.errorText.length > 0}
+                      >
+                        Submit
+                      </Button>
+                    ) : ""
                   }
                 </td>
               </tr>
