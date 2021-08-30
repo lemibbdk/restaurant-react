@@ -1,5 +1,5 @@
 import AdministratorModel from '../models/AdministratorModel';
-import api from '../api/api';
+import api, { ApiResponse } from '../api/api';
 import EventRegister from '../api/EventRegister';
 
 interface IAdministratorAdd {
@@ -67,12 +67,20 @@ export default class AdministratorService {
     return new Promise<AdministratorModel|null> (resolve => {
       api('PUT', 'administrator/' + administratorId, 'administrator', data)
         .then(res => {
-          console.log(res)
           if (res?.status !== 'ok') {
             return resolve(null)
           }
 
           resolve(res.data as AdministratorModel)
+        })
+    })
+  }
+
+  public static deleteAdministrator(administratorId: number): Promise<ApiResponse> {
+    return new Promise<ApiResponse>(resolve => {
+      api('DELETE', 'administrator/' + administratorId, 'administrator')
+        .then(res => {
+          resolve(res)
         })
     })
   }

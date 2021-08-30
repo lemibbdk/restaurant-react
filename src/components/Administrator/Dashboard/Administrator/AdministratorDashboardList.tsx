@@ -40,6 +40,17 @@ export default class AdministratorDashboardList extends BasePage<{}> {
       })
   }
 
+  private handleDeleteButton(administratorId: number) {
+    AdministratorService.deleteAdministrator(+(administratorId))
+      .then(res => {
+        if (res.data.errorCode !== 0) {
+          return this.setState({message: 'Unable to delete admin'})
+        }
+        console.log(res)
+        this.loadAdministrators();
+      })
+  }
+
   renderMain(): JSX.Element {
     return (
       <>
@@ -71,6 +82,10 @@ export default class AdministratorDashboardList extends BasePage<{}> {
                       Edit
                     </Button>
                   </Link>
+
+                  <Button variant="danger" onClick={() => this.handleDeleteButton(el.administratorId)}>
+                    Delete
+                  </Button>
                 </td>
               </tr>
             ))

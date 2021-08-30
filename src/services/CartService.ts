@@ -98,8 +98,8 @@ export default class CartService {
       console.log(data)
       api('PUT', '/cart/' + cartId + '/edit', 'user', data)
         .then(res => {
-          if (res.status === 'error') {
             console.log(res)
+          if (res.status === 'error') {
             if (Array.isArray(res?.data?.data)) {
               return resolve({
                 success: false,
