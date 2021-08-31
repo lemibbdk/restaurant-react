@@ -27,6 +27,7 @@ import AdministratorDashboardList from '../Administrator/Dashboard/Administrator
 import UserProfile from '../User/UserProfile';
 import OrderList from '../Order/OrderList';
 import AdministratorDashboardAdd from '../Administrator/Dashboard/Administrator/AdministratorDashboardAdd';
+import EvaluationAdd from '../Evaluation/EvaluationAdd';
 
 class ApplicationState {
   authorizedRole: "user" | "administrator" | "visitor" = "visitor";
@@ -130,6 +131,7 @@ export default class Application extends React.Component {
               <Route exact path="/dashboard/administrator/:aid/edit" component={AdministratorDashboardAdd} />
 
               <Route exact path="/order" component={OrderList} />
+              <Route exact path="/order/:oid/evaluate" component={EvaluationAdd} />
               <Route exact path="/cart/:cid/edit" component={CartPage} />
             </Switch>
           </div>

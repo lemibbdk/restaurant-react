@@ -21,6 +21,13 @@ interface IResult {
   message?: string;
 }
 
+interface IAddEvaluation {
+  orderId: number;
+  cartId: number;
+  score: string;
+  remark: string;
+}
+
 export default class CartService {
   @MemoizeExpiring(2000)
   public static getCart(): Promise<CartModel|null> {
@@ -169,6 +176,23 @@ export default class CartService {
           }
 
           resolve(res.data);
+        })
+    })
+  }
+
+  public static addEvaluation(data: IAddEvaluation) {
+    return new Promise<IResult>(resolve => {
+      api('POST', '/evaluation', 'user', data)
+        .then(res => {
+          if (res.status !== 'ok') {
+            return resolve({
+              success: false
+            })
+          }
+
+          resolve({
+            success: true
+          })
         })
     })
   }

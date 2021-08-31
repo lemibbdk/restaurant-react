@@ -37,6 +37,7 @@ export default class OrderList extends BasePage<{}> {
   private getOrders() {
     CartService.getUserOrders()
       .then(res => {
+        console.log(res)
         this.setState({carts: res});
       })
   }
@@ -65,7 +66,7 @@ export default class OrderList extends BasePage<{}> {
     return (
       <>
         <div>
-          <h1 className="text-center">All Orders</h1>
+          <h1 className="text-center">Your Orders</h1>
         </div>
 
         <table className="table table-sm">
@@ -74,7 +75,6 @@ export default class OrderList extends BasePage<{}> {
             <th>#ID</th>
             <th>Date and Time</th>
             <th>Total price</th>
-            <th>User</th>
             <th>Status</th>
             <th>Options</th>
           </tr>
@@ -90,24 +90,31 @@ export default class OrderList extends BasePage<{}> {
                   .toFixed(2)
                 }
                 </td>
-                <td>{ cart.user.email }</td>
                 <td>
                   { cart.order?.status }
                 </td>
                 <td>
                   <Button
                     variant="danger"
-                    disabled={ cart.order?.status !== 'pending' }
+                    className={ cart.order?.status !== 'pending' ? 'd-none' : '' }
                     onClick={ () => this.cancelOrder(cart.cartId) } >
                     Cancel order
                   </Button>
-                  <Link className={ cart.order?.status !== 'pending' ?  "nav-link pe-none" : "nav-link"}
+                  <Link className={ cart.order?.status !== 'pending' ?  "d-none" : "nav-link"}
                         to={"/cart/" + cart.cartId + "/edit" }>
                     <Button
                       className="ms-2"
                       variant="primary"
                       disabled={ cart.order?.status !== 'pending' } >
                       Edit
+                    </Button>
+                  </Link>
+                  <Link className={ cart.order?.status !== 'completed' || cart.order?.evaluation ?  "d-none" : "nav-link"}
+                        to={"/order/" + cart.order?.orderId + "/evaluate" }>
+                    <Button
+                      className="ms-2"
+                      variant="info" >
+                      Evaluate
                     </Button>
                   </Link>
                 </td>
