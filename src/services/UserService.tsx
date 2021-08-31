@@ -1,5 +1,5 @@
 import UserModel from '../models/UserModel';
-import api from '../api/api';
+import api, { ApiResponse } from '../api/api';
 import EventRegister from '../api/EventRegister';
 import PostalAddressModel from '../models/PostalAddressModel';
 
@@ -62,6 +62,24 @@ export default class UserService {
 
          resolve(res.data as UserModel)
        })
+    });
+  }
+
+  public static delete(userId: number): Promise<ApiResponse | null> {
+    return new Promise<ApiResponse|null>(resolve => {
+      api('DELETE', '/user/' + userId, 'user')
+        .then(res => {
+          console.log(res)
+          if (res?.status !== 'ok') {
+            if (res.status === 'login') {
+              EventRegister.emit('AUTH_EVENT', 'force_login');
+            }
+
+            return resolve(null);
+          }
+
+          resolve(res.data)
+        })
     });
   }
 }

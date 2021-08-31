@@ -6,6 +6,7 @@ import { isRoleLoggedIn } from '../../../../api/api';
 import UserService from '../../../../services/UserService';
 import CartService from '../../../../services/CartService';
 import CartModel from '../../../../models/CartModel';
+import { Button } from 'react-bootstrap';
 
 interface UserDashboardListState {
   users: UserModel[];
@@ -63,8 +64,13 @@ export default class UserDashboardList extends BasePage<{}> {
               }})
           }
         })
+      })
+  }
 
-        console.log(this.state.ordersCounter)
+  private deleteButtonHandler(userId: number) {
+    UserService.delete(userId)
+      .then(res => {
+        this.loadUsers();
       })
   }
 
@@ -81,6 +87,7 @@ export default class UserDashboardList extends BasePage<{}> {
             <th>Surname</th>
             <th>Active</th>
             <th>Orders Completed</th>
+            <th>Options</th>
           </tr>
           </thead>
           <tbody>
@@ -93,6 +100,9 @@ export default class UserDashboardList extends BasePage<{}> {
                 <td>{ el.surname }</td>
                 <td>{ el.isActive ? 'True' : 'Else' }</td>
                 <td> {this.state.ordersCounter[el.userId] ? this.state.ordersCounter[el.userId] : '0'} </td>
+                <td>
+                  <Button variant='danger' onClick={() => this.deleteButtonHandler(el.userId)}>Delete</Button>
+                </td>
               </tr>
             ))
           }
