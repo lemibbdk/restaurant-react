@@ -138,7 +138,7 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
     }
   }
 
-  private handleAddButtonClick() {
+  private handleEditButtonClick() {
     const data: IEditItem = {
       name: this.state.name,
       ingredients: this.state.ingredients,
@@ -184,7 +184,7 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
             <Card>
               <Card.Body>
                 <Card.Title>
-                  <b>Add new item</b>
+                  <b>Edit item</b>
 
                 </Card.Title>
                 <Card.Text as="div">
@@ -299,8 +299,8 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
 
                     <Form.Group className="d-grid">
                       <Button variant="primary" className="mt-3"
-                              onClick= { () => this.handleAddButtonClick() } >
-                        Add
+                              onClick= { () => this.handleEditButtonClick() } >
+                        Edit
                       </Button>
                     </Form.Group>
 
