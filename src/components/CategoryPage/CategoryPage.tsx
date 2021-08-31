@@ -5,8 +5,9 @@ import CategoryService from '../../services/CategoryService';
 import EventRegister from '../../api/EventRegister';
 import ItemModel from '../../models/ItemModel';
 import ItemService from '../../services/ItemService';
-import { CardDeck } from 'react-bootstrap';
+import { Button, CardDeck } from 'react-bootstrap';
 import Item from '../Item/Item';
+import './CategoryPage.sass';
 
 class CategoryPageProperties extends BasePageProperties {
   match?: {
@@ -86,7 +87,8 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
             title: 'Category not  found.',
             subCategories: [],
             showBackButton: true,
-            parentCategoryId: null
+            parentCategoryId: null,
+            items: []
           })
         }
 
@@ -140,23 +142,25 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
     }
 
     return (
-      <>
+      <div>
         {
           this.state.showBackButton
             ? (
               <Link to={ '/category/' + (this.state.parentCategoryId ?? '') }>
-                &lt; Back
+                <Button variant="info">
+                  &lt; Back
+                </Button>
               </Link>
             )
             : ''
         }
-        <h1> { this.state.title } </h1>
+        <h1 className="text-center"> { this.state.title } </h1>
 
         {
           this.state.subCategories.length > 0
             ? (
               <>
-                <p>Podkategorije:</p>
+                {this.props.match?.params.cid ? <p>Podkategorije:</p> : ""}
                 <ul>
                   { this.state.subCategories.map(category => (
                     <li key={ 'category-link-' + category.categoryId }>
@@ -172,14 +176,19 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
             : ''
         }
 
-        <CardDeck className="row">
-          {
-            this.state.items.map(item => (
-              <Item key={ "item-" + item.itemId } item={ item } />
-            ))
-          }
-        </CardDeck>
-      </>
+        {
+          this.state.subCategories.length === 0 ?
+            <CardDeck className="row justify-content-center">
+              {
+                this.state.items.map(item => (
+                  <Item key={ "item-" + item.itemId } item={ item } />
+                ))
+              }
+            </CardDeck>
+            :
+            ""
+        }
+      </div>
     );
   }
 }
