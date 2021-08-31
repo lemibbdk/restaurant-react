@@ -88,7 +88,7 @@ export default class Application extends React.Component {
       <BrowserRouter>
         <Container className="Application">
           <div className="Application-header">
-            Front-end aplikacije
+
           </div>
           <TopMenu currentMenuType={ this.state.authorizedRole } />
           <div className="Application-body">
@@ -134,7 +134,7 @@ export default class Application extends React.Component {
             </Switch>
           </div>
           <div>
-            &copy; 2021...
+
           </div>
         </Container>
       </BrowserRouter>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import CartLink from '../Cart/CartLink';
+import './TopMenu.sass';
 
 class TopMenuProperties {
   currentMenuType: "user" | "administrator" | "visitor" = "visitor";
@@ -11,7 +12,7 @@ export default class TopMenu extends React.Component<TopMenuProperties> {
   render() {
     if (this.props.currentMenuType === "visitor") {
       return (
-        <Nav className="justify-content-center">
+        <Nav className="justify-content-center navigation">
           <Nav.Item>
             <Link className="nav-link" to="/">Home</Link>
           </Nav.Item>
@@ -33,7 +34,7 @@ export default class TopMenu extends React.Component<TopMenuProperties> {
 
     if (this.props.currentMenuType === "administrator") {
       return (
-        <Nav className="justify-content-center">
+        <Nav className="justify-content-center navigation">
           <Nav.Item>
             <Link className="nav-link" to="/dashboard/category">Categories</Link>
           </Nav.Item>
@@ -63,7 +64,7 @@ export default class TopMenu extends React.Component<TopMenuProperties> {
 
     if (this.props.currentMenuType === "user") {
       return (
-        <Nav className="justify-content-center">
+        <Nav className="justify-content-center navigation">
           <Nav.Item>
             <Link className="nav-link" to="/">Home</Link>
           </Nav.Item>

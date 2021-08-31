@@ -7,6 +7,7 @@ import React from 'react';
 import CartService from '../../services/CartService';
 import { AppConfiguration } from '../../config/app.config';
 import ImageGallery from 'react-image-gallery';
+import './ItemPage.sass'
 
 class ItemPageProperties extends BasePageProperties {
   match?: {
@@ -99,7 +100,11 @@ export default class ItemPage extends BasePage<ItemPageProperties> {
       <>
         <div>
           <h1>
-            <Link to={ "/category/" + item.categoryId }> &lt; Back </Link>
+            <Link to={ "/category/" + item.categoryId }>
+              <Button variant="info">
+                &lt; Back
+              </Button>
+            </Link>
           </h1>
           <h1 className="text-center">{item.name}</h1>
         </div>
@@ -119,21 +124,21 @@ export default class ItemPage extends BasePage<ItemPageProperties> {
                       <Card key={ "item-info-" + itemInfo.itemInfoId } className="mb-3">
                         <Card.Body>
                           <Row>
-                            <Col xs={ 6 } md={ 1 }>
-                              <strong> {itemInfo.size} </strong>
+                            <Col xs={ 6 } md={ 2 }>
+                              <strong> Size: {itemInfo.size} </strong>
                             </Col>
-                            <Col xs={ 6 } md={ 1 }>
-                              <strong> {itemInfo.energyValue} </strong>
+                            <Col xs={ 6 } md={ 2 }>
+                              <strong> En.v. : {itemInfo.energyValue} </strong>
                             </Col>
-                            <Col xs={ 6 } md={ 1 }>
-                              <strong> {itemInfo.mass} </strong>
+                            <Col xs={ 6 } md={ 2 }>
+                              <strong> Mass: {itemInfo.mass} </strong>
                             </Col>
-                            <Col xs={ 6 } md={ 4 }>
+                            <Col xs={ 6 } md={ 3 }>
                               <strong className="h1">
                                 &euro; { itemInfo.price.toFixed(2) }
                               </strong>
                             </Col>
-                            <Col xs={ 12 } md={ 5 }>
+                            <Col xs={ 12 } md={ 3 }>
                               <Card className="border-0">
                                 <Card.Body>
                                   <Card.Title>
