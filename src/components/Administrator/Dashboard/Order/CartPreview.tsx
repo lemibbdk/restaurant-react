@@ -10,6 +10,12 @@ interface CartPreviewProperties {
 }
 
 export default class CartPreview extends React.Component<CartPreviewProperties> {
+  constructor(props: any) {
+    super(props);
+
+    console.log(props)
+  }
+
   render() {
     return (
       <Modal show size="lg" centered onHide={this.props.onClose}>
