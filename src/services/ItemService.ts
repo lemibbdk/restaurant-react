@@ -1,5 +1,5 @@
 import ItemModel from '../models/ItemModel';
-import api, { apiAsForm, ApiRole } from '../api/api';
+import api, { apiAsForm, ApiResponse, ApiRole } from '../api/api';
 import EventRegister from '../api/EventRegister';
 import * as path from 'path';
 
@@ -192,6 +192,24 @@ export default class ItemService {
           })
       }
     })
+  }
+
+  public static delete(itemId: number): Promise<ApiResponse | null> {
+    return new Promise<ApiResponse|null>(resolve => {
+      api('DELETE', '/item/' + itemId, 'administrator')
+        .then(res => {
+          console.log(res)
+          if (res?.status !== 'ok') {
+            if (res.status === 'login') {
+              EventRegister.emit('AUTH_EVENT', 'force_login');
+            }
+
+            return resolve(null);
+          }
+
+          resolve(res.data)
+        })
+    });
   }
 
   public static getThumbPath(url: string): string {

@@ -6,7 +6,7 @@ import CategoryService from '../../../../services/CategoryService';
 import { Button, Form, FormGroup } from 'react-bootstrap';
 import React from 'react';
 import { AppConfiguration } from '../../../../config/app.config';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 interface ItemDashboardListState {
   // categories: Array<CategoryModel[]>;
@@ -16,6 +16,7 @@ interface ItemDashboardListState {
   items: ItemModel[];
   message: string;
   forms: JSX.Element[];
+  redirectBackToItems: boolean;
 }
 
 export default class ItemDashboardList extends BasePage<{}> {
@@ -30,7 +31,8 @@ export default class ItemDashboardList extends BasePage<{}> {
       selectedLowLevelCategory: null,
       forms: [],
       message: '',
-      items: []
+      items: [],
+      redirectBackToItems: false
     }
   }
 
@@ -106,7 +108,20 @@ export default class ItemDashboardList extends BasePage<{}> {
     )
   }
 
+  private deleteButtonHandler(itemId: number) {
+    ItemService.delete(itemId)
+      .then(res => {
+        if (res !== null) {
+          this.setState({redirectBackToItems: true})
+        }
+      })
+  }
+
   renderMain(): JSX.Element {
+    if (this.state.redirectBackToItems) {
+      return ( <Redirect to="/item" /> );
+    }
+
     return (
       <>
         <FormGroup>
@@ -168,6 +183,9 @@ export default class ItemDashboardList extends BasePage<{}> {
                       Edit photo
                     </Button>
                   </Link>
+                  <Button variant="danger" onClick={() => this.deleteButtonHandler(el.itemId)}>
+                    Delete item
+                  </Button>
                 </td>
               </tr>
             ))
