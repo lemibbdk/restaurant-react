@@ -46,16 +46,34 @@ export default class CartService {
       });
   }
 
-  public static setToCart(itemInfoId: number, newQuantity: number) {
-    api('PUT', '/cart', 'user', {
-      itemInfoId,
-      quantity: newQuantity
-    })
-      .then(res => {
-        if (res.status !== 'ok') return;
-        if (res.data.errorCode !== undefined) return;
-        EventRegister.emit('CART_EVENT', 'cart.update', itemInfoId, newQuantity);
-      });
+  public static setToCart(itemInfoId: number, newQuantity: number, notLastCart: boolean = false, cartId: number = 0) {
+    console.log(cartId)
+    if (notLastCart) {
+      if (cartId === 0) return;
+
+      api('PUT', '/cart', 'user', {
+        itemInfoId,
+        quantity: newQuantity,
+        notLastCart,
+        cartId
+      })
+        .then(res => {
+          console.log(res)
+          if (res.status !== 'ok') return;
+          if (res.data.errorCode !== undefined) return;
+          EventRegister.emit('CART_EDIT_EVENT', res.data);
+        });
+    } else {
+      api('PUT', '/cart', 'user', {
+        itemInfoId,
+        quantity: newQuantity
+      })
+        .then(res => {
+          if (res.status !== 'ok') return;
+          if (res.data.errorCode !== undefined) return;
+          EventRegister.emit('CART_EVENT', 'cart.update', itemInfoId, newQuantity);
+        });
+    }
   }
 
   public static makeOrder(desiredDeliveryTime: Date, footnote: string, addressId: number): Promise<IResult> {

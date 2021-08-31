@@ -146,7 +146,6 @@ export default class CartPage extends BasePage<CartPageProperties> {
         res.forEach(el => {
           if (el.cartId === this.getCartEditId()) {
             if (el.order?.status !== 'pending') return this.setState({errorText: "You can't edit this cart"})
-            console.log(el)
             this.setState({
               cart: el,
               editing: true,
@@ -157,16 +156,26 @@ export default class CartPage extends BasePage<CartPageProperties> {
       })
   }
 
+  private eventEditCart(data: any[]) {
+    this.setState({cart: data })
+  }
+
   componentDidMount() {
     this.getUserData();
 
-    if (this.getCartEditId()) return this.getEditCart()
+    if (this.getCartEditId()) {
+      this.getEditCart()
+      return EventRegister.on('CART_EDIT_EVENT', this.eventEditCart.bind(this));
+    }
 
+    this.getCartData();
     EventRegister.on('CART_EVENT', this.getCartData.bind(this));
+
   }
 
   componentWillUnmount() {
     EventRegister.off('CART_EVENT', this.getCartData.bind(this));
+    EventRegister.off('CART_EDIT_EVENT', this.eventEditCart.bind(this));
   }
 
   private onChangeQuantityInput(cartItemId: number): (event: React.ChangeEvent<HTMLInputElement>) => void {
@@ -217,7 +226,8 @@ export default class CartPage extends BasePage<CartPageProperties> {
 
           for (let i=0; i<this.state.cart.itemInfos.length; i++) {
             if (this.state.cart.itemInfos[i].itemInfoId === itemInfoId) {
-              CartService.setToCart(this.state.cart.itemInfos[i].itemInfoId, 0);
+              if (this.state.editing) CartService.setToCart(this.state.cart.itemInfos[i].itemInfoId, 0, true, this.state.cart.cartId);
+              else CartService.setToCart(this.state.cart.itemInfos[i].itemInfoId, 0);
               return this.setState({
                 showDeleteDialog: false,
               });
@@ -305,7 +315,6 @@ export default class CartPage extends BasePage<CartPageProperties> {
 
           CartService.editCart(this.state.cart.cartId, data)
             .then(res => {
-              console.log(res)
               if (!res.success) {
                 return this.setState({
                   errorText: res.message
@@ -430,6 +439,7 @@ export default class CartPage extends BasePage<CartPageProperties> {
                   </td>
                   <td>
                     <Button variant="danger"
+                            disabled={this.state.editing && this.state.cart?.itemInfos.length === 1}
                             onClick={ this.getDeleteHandler(el.itemInfoId) }>
                       Delete
                     </Button>
