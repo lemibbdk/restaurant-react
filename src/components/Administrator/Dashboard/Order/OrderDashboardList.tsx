@@ -15,11 +15,9 @@ interface OrderDashboardListState {
 
 export default class OrderDashboardList extends BasePage<{}> {
   state: OrderDashboardListState;
-  wrapper: React.RefObject<any>;
+
   constructor(props: any) {
     super(props);
-
-    this.wrapper = React.createRef();
 
     this.state = {
       carts: [],
@@ -96,14 +94,14 @@ export default class OrderDashboardList extends BasePage<{}> {
 
         <table className="table table-sm">
           <thead>
-          <tr>
-            <th>#ID</th>
-            <th>Date and Time</th>
-            <th>Total price</th>
-            <th>User</th>
-            <th>Status</th>
-            <th>Options</th>
-          </tr>
+            <tr>
+              <th>#ID</th>
+              <th>Date and Time</th>
+              <th>Total price</th>
+              <th>User</th>
+              <th>Status</th>
+              <th>Options</th>
+            </tr>
           </thead>
           <tbody>
           {
@@ -134,7 +132,7 @@ export default class OrderDashboardList extends BasePage<{}> {
                         disabled={ !this.state.cartStatusSaveButtonEnabled.get(cart.cartId) }
                         variant="primary"
                         onClick={() => this.setNewOrderStatus(cart.cartId)} >
-                        Set status
+                      Set status
                       </Button>
                     </InputGroup.Append>
                   </InputGroup>
@@ -152,18 +150,14 @@ export default class OrderDashboardList extends BasePage<{}> {
           </tbody>
         </table>
 
-        <div ref={this.wrapper}>
-          {
-            this.state.displayedCart !== null
-              ? ( <CartPreview
-                ref={this.wrapper}
-                cart={ this.state.displayedCart }
-                onClose={ () => this.setState({ displayedCart: null }) }
-              /> )
-              : ""
-          }
-        </div>
-
+        {
+          this.state.displayedCart !== null
+            ? ( <CartPreview
+              cart={ this.state.displayedCart }
+              onClose={ () => this.setState({ displayedCart: null }) }
+            /> )
+            : null
+        }
       </>
     );
   }

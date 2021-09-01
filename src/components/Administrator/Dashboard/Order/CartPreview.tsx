@@ -2,7 +2,6 @@ import { Modal } from 'react-bootstrap';
 import CartModel from '../../../../models/CartModel';
 import ItemService from '../../../../services/ItemService';
 import { AppConfiguration } from '../../../../config/app.config';
-import React from 'react';
 
 interface CartPreviewProperties {
   cart: CartModel;
@@ -12,13 +11,11 @@ interface CartPreviewProperties {
 export default class CartPreview extends React.Component<CartPreviewProperties> {
   constructor(props: any) {
     super(props);
-
-    console.log(props)
   }
 
   render() {
     return (
-      <Modal show size="lg" centered onHide={this.props.onClose}>
+      <Modal show size="lg" centered onHide={this.props.onClose} animation={false}>
         <Modal.Header>
           <Modal.Title>Shopping cart listing</Modal.Title>
         </Modal.Header>
