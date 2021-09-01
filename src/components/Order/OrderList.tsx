@@ -7,6 +7,7 @@ import { Button } from 'react-bootstrap';
 import CartPreview from '../Administrator/Dashboard/Order/CartPreview';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './OrdedList.sass';
 
 interface OrderListState {
   carts: CartModel[];
@@ -69,7 +70,7 @@ export default class OrderList extends BasePage<{}> {
           <h1 className="text-center">Your Orders</h1>
         </div>
 
-        <table className="table table-sm">
+        <table className="table table-sm table-order">
           <thead>
           <tr>
             <th>#ID</th>
@@ -98,15 +99,15 @@ export default class OrderList extends BasePage<{}> {
                     variant="danger"
                     className={ cart.order?.status !== 'pending' ? 'd-none' : '' }
                     onClick={ () => this.cancelOrder(cart.cartId) } >
-                    Cancel order
+                    <i className="bi bi-x-square-fill" />
                   </Button>
                   <Link className={ cart.order?.status !== 'pending' ?  "d-none" : "nav-link"}
                         to={"/cart/" + cart.cartId + "/edit" }>
                     <Button
-                      className="ms-2"
                       variant="primary"
+                      className="ms-2"
                       disabled={ cart.order?.status !== 'pending' } >
-                      Edit
+                      <i className="bi bi-pencil-fill" />
                     </Button>
                   </Link>
                   <Link className={ cart.order?.status !== 'completed' || cart.order?.evaluation ?  "d-none" : "nav-link"}
@@ -114,9 +115,15 @@ export default class OrderList extends BasePage<{}> {
                     <Button
                       className="ms-2"
                       variant="info" >
-                      Evaluate
+                      <i className="bi bi-clipboard-check" />
                     </Button>
                   </Link>
+                  <Button
+                    variant="secondary"
+                    className="ms-2"
+                    onClick={ () => this.setState({ displayedCart: cart }) }>
+                    <i className="bi bi-eye-fill" />
+                  </Button>
                 </td>
               </tr>
             ))
