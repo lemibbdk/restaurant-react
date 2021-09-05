@@ -5,9 +5,10 @@ import EventRegister from '../../api/EventRegister';
 import CartService from '../../services/CartService';
 import { Button } from 'react-bootstrap';
 import CartPreview from '../Administrator/Dashboard/Order/CartPreview';
-import React from 'react';
+import React  from 'react';
 import { Link } from 'react-router-dom';
 import './OrdedList.sass';
+import ReactTooltip from 'react-tooltip';
 
 interface OrderListState {
   carts: CartModel[];
@@ -16,6 +17,7 @@ interface OrderListState {
 
 export default class OrderList extends BasePage<{}> {
   state: OrderListState;
+  wrapper: React.RefObject<any>;
 
   constructor(props: any) {
     super(props);
@@ -24,6 +26,8 @@ export default class OrderList extends BasePage<{}> {
       carts: [],
       displayedCart: null
     }
+
+    this.wrapper = React.createRef();
   }
 
   componentDidMount() {
@@ -97,33 +101,60 @@ export default class OrderList extends BasePage<{}> {
                 <td>
                   <Button
                     variant="danger"
+                    data-tip
+                    data-for={"tooltip-cancel-" + cart.cartId}
                     className={ cart.order?.status !== 'pending' ? 'd-none' : '' }
                     onClick={ () => this.cancelOrder(cart.cartId) } >
                     <i className="bi bi-x-square-fill" />
                   </Button>
+
+                  <ReactTooltip id={"tooltip-cancel-" + cart.cartId} place="top" effect="solid" className="tooltip-custom">
+                    Cancel order
+                  </ReactTooltip>
                   <Link className={ cart.order?.status !== 'pending' ?  "d-none" : "nav-link"}
                         to={"/cart/" + cart.cartId + "/edit" }>
                     <Button
                       variant="primary"
+                      data-tip
+                      data-for={"tooltip-edit-" + cart.cartId}
                       className="ms-2"
                       disabled={ cart.order?.status !== 'pending' } >
                       <i className="bi bi-pencil-fill" />
                     </Button>
+                    <ReactTooltip id={"tooltip-edit-" + cart.cartId} place="top" effect="solid" className="tooltip-custom">
+                      Edit order
+                    </ReactTooltip>
                   </Link>
+
+
+
                   <Link className={ cart.order?.status !== 'completed' || cart.order?.evaluation ?  "d-none" : "nav-link"}
                         to={"/order/" + cart.order?.orderId + "/evaluate" }>
                     <Button
                       className="ms-2"
+                      data-tip
+                      data-for={"tooltip-evaluate-" + cart.cartId}
                       variant="info" >
                       <i className="bi bi-clipboard-check" />
                     </Button>
+
+                    <ReactTooltip id={"tooltip-evaluate-" + cart.cartId} place="top" effect="solid" className="tooltip-custom">
+                      Evaluate
+                    </ReactTooltip>
                   </Link>
+
                   <Button
                     variant="secondary"
+                    data-tip
+                    data-for={"tooltip-preview-" + cart.cartId}
                     className="ms-2"
                     onClick={ () => this.setState({ displayedCart: cart }) }>
                     <i className="bi bi-eye-fill" />
                   </Button>
+
+                  <ReactTooltip id={"tooltip-preview-" + cart.cartId} place="top" effect="solid" className="tooltip-custom">
+                    Preview
+                  </ReactTooltip>
                 </td>
               </tr>
             ))
