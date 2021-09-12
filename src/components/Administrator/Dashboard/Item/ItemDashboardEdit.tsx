@@ -1,4 +1,4 @@
-import BasePage, { BasePageProperties } from '../../../BasePage/BasePage';
+import BasePage, {BasePageProperties, IFormErrors} from '../../../BasePage/BasePage';
 import { isRoleLoggedIn } from '../../../../api/api';
 import EventRegister from '../../../../api/EventRegister';
 import ItemService, { IEditItem } from '../../../../services/ItemService';
@@ -37,6 +37,7 @@ interface ItemDashboardEditState {
   message: string;
 
   redirectBackToItems: boolean;
+  errors: IFormErrors
 }
 
 export default class ItemDashboardEdit extends BasePage<ItemDashboardEditProperties> {
@@ -66,7 +67,8 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
 
       message: '',
 
-      redirectBackToItems: false
+      redirectBackToItems: false,
+      errors: {}
     }
   }
 
@@ -138,7 +140,35 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
     }
   }
 
+  findFormErrors(): IFormErrors {
+    const {name, ingredients, energyValueS, massS, priceS, energyValueL, massL, priceL, energyValueXL, massXL,
+      priceXL} = this.state;
+    const newErrors: IFormErrors = {};
+
+    if (!name || name === '') newErrors.name = 'Cannot be blank!';
+    else if (name.length > 30) newErrors.name = 'Name is too long';
+
+    if (!ingredients || ingredients === '') newErrors.ingredients = 'Cannot be blank!';
+    else if (ingredients.length > 100) newErrors.ingredients = 'Ingredients is too long';
+
+    const numberValues = [energyValueS, massS, priceS, energyValueL, massL, priceL, energyValueXL, massXL, priceXL];
+
+    for (let i = 0; i < numberValues.length; i++) {
+      if (!numberValues[i] || numberValues[i] === '') newErrors['numValue'+i] = 'Cannot be blank';
+      else if (isNaN(Number(numberValues[i]))) newErrors['numValue'+i] = 'Must be a number';
+    }
+
+    return newErrors;
+  }
+
   private handleEditButtonClick() {
+    const newErrors = this.findFormErrors();
+
+    if (Object.keys(newErrors).length > 0) {
+      this.setState({errors: newErrors})
+      return;
+    }
+
     const data: IEditItem = {
       name: this.state.name,
       ingredients: this.state.ingredients,
@@ -195,7 +225,12 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
                                     placeholder="Enter item name"
                                     value={ this.state.name }
                                     onChange={ this.onChangeInput("name") }
+                                    isInvalid={ !!this.state.errors.name }
                       />
+
+                      <Form.Control.Feedback type='invalid'>
+                        {this.state.errors.name}
+                      </Form.Control.Feedback>
                     </Form.Group>
 
                     <Form.Group>
@@ -204,7 +239,12 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
                                     placeholder="Enter ingredients"
                                     value={ this.state.ingredients }
                                     onChange={ this.onChangeInput("ingredients") }
+                                    isInvalid={ !!this.state.errors.ingredients }
                       />
+
+                      <Form.Control.Feedback type='invalid'>
+                        {this.state.errors.ingredients}
+                      </Form.Control.Feedback>
                     </Form.Group>
 
                     <Card>
@@ -216,7 +256,12 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
                                         placeholder="Enter energy value"
                                         value={ this.state.energyValueS }
                                         onChange={ this.onChangeInput("energyValueS") }
+                                        isInvalid={ !!this.state.errors.numValue0 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue0}
+                          </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
                           <Form.Label>Mass:</Form.Label>
@@ -224,7 +269,12 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
                                         placeholder="Enter mass"
                                         value={ this.state.massS }
                                         onChange={ this.onChangeInput("massS") }
+                                        isInvalid={ !!this.state.errors.numValue1 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue1}
+                          </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
                           <Form.Label>Price:</Form.Label>
@@ -232,7 +282,12 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
                                         placeholder="Enter price"
                                         value={ this.state.priceS }
                                         onChange={ this.onChangeInput("priceS") }
+                                        isInvalid={ !!this.state.errors.numValue2 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue2}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Card.Body>
                     </Card>
@@ -246,7 +301,12 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
                                         placeholder="Enter energy value"
                                         value={ this.state.energyValueL }
                                         onChange={ this.onChangeInput("energyValueL") }
+                                        isInvalid={ !!this.state.errors.numValue3 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue3}
+                          </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
                           <Form.Label>Mass:</Form.Label>
@@ -254,7 +314,12 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
                                         placeholder="Enter mass"
                                         value={ this.state.massL }
                                         onChange={ this.onChangeInput("massL") }
+                                        isInvalid={ !!this.state.errors.numValue4 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue4}
+                          </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
                           <Form.Label>Price:</Form.Label>
@@ -262,7 +327,12 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
                                         placeholder="Enter price"
                                         value={ this.state.priceL }
                                         onChange={ this.onChangeInput("priceL") }
+                                        isInvalid={ !!this.state.errors.numValue5 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue5}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Card.Body>
                     </Card>
@@ -276,7 +346,12 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
                                         placeholder="Enter energy value"
                                         value={ this.state.energyValueXL }
                                         onChange={ this.onChangeInput("energyValueXL") }
+                                        isInvalid={ !!this.state.errors.numValue6 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue6}
+                          </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
                           <Form.Label>Mass:</Form.Label>
@@ -284,7 +359,12 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
                                         placeholder="Enter mass"
                                         value={ this.state.massXL }
                                         onChange={ this.onChangeInput("massXL") }
+                                        isInvalid={ !!this.state.errors.numValue7 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue7}
+                          </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
                           <Form.Label>Price:</Form.Label>
@@ -292,7 +372,12 @@ export default class ItemDashboardEdit extends BasePage<ItemDashboardEditPropert
                                         placeholder="Enter price"
                                         value={ this.state.priceXL }
                                         onChange={ this.onChangeInput("priceXL") }
+                                        isInvalid={ !!this.state.errors.numValue8 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue8}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Card.Body>
                     </Card>

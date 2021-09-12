@@ -1,4 +1,4 @@
-import BasePage, { BasePageProperties } from '../../../BasePage/BasePage';
+import BasePage, {BasePageProperties, IFormErrors} from '../../../BasePage/BasePage';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
 import React from 'react';
 import AdministratorService from '../../../../services/AdministratorService';
@@ -20,6 +20,7 @@ interface AdministratorDashboardAddState {
   editing: boolean;
   message: string;
   redirectBackToAdmins: boolean;
+  errors: IFormErrors;
 }
 
 export default class AdministratorDashboardAdd extends BasePage<ItemDashboardAddProperties> {
@@ -33,7 +34,8 @@ export default class AdministratorDashboardAdd extends BasePage<ItemDashboardAdd
       password: '',
       editing: false,
       message: '',
-      redirectBackToAdmins: false
+      redirectBackToAdmins: false,
+      errors: {}
     }
   }
 
@@ -71,7 +73,28 @@ export default class AdministratorDashboardAdd extends BasePage<ItemDashboardAdd
     }
   }
 
+  findFormErrors(): IFormErrors {
+    const {username, password} = this.state;
+    const newErrors: IFormErrors = {};
+
+    if (!username || username === '') newErrors.username = 'Cannot be blank!';
+    else if (username.length > 30) newErrors.username = 'Name is too long';
+
+
+    if (!password || password === '') newErrors.password = 'Cannot be blank!';
+    else if (password.length > 30) newErrors.password = 'Name is too long';
+
+    return newErrors;
+  }
+
   private handleAddButton(event: React.SyntheticEvent) {
+    const newErrors = this.findFormErrors();
+
+    if (Object.keys(newErrors).length > 0) {
+      this.setState({errors: newErrors})
+      return;
+    }
+
     event.preventDefault();
     const data = {
       username: this.state.username,
@@ -133,7 +156,12 @@ export default class AdministratorDashboardAdd extends BasePage<ItemDashboardAdd
                               placeholder="Enter username here..."
                               value={ this.state.username }
                               onChange={ this.onChangeInput("username") }
+                              isInvalid={ !!this.state.errors.username }
                             />
+
+                            <Form.Control.Feedback type='invalid'>
+                              {this.state.errors.username}
+                            </Form.Control.Feedback>
                           </Form.Group>
                       }
                     </Col>
@@ -147,7 +175,12 @@ export default class AdministratorDashboardAdd extends BasePage<ItemDashboardAdd
                           placeholder="Enter password here..."
                           value={ this.state.password }
                           onChange={ this.onChangeInput("password") }
+                          isInvalid={ !!this.state.errors.password }
                         />
+
+                        <Form.Control.Feedback type='invalid'>
+                          {this.state.errors.password}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
