@@ -1,5 +1,5 @@
 import CategoryModel from '../../../../models/CategoryModel';
-import BasePage from '../../../BasePage/BasePage';
+import BasePage, {IFormErrors} from '../../../BasePage/BasePage';
 import { Link, Redirect } from 'react-router-dom';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
 import React from 'react';
@@ -14,6 +14,7 @@ interface CategoryDashboardAddState {
   selectedParent: string;
   message: string;
   redirectBackToCategories: boolean;
+  errors: IFormErrors;
 }
 
 export default class CategoryDashboardAdd extends BasePage<{}> {
@@ -27,7 +28,8 @@ export default class CategoryDashboardAdd extends BasePage<{}> {
       name: '',
       selectedParent: '',
       message: '',
-      redirectBackToCategories: false
+      redirectBackToCategories: false,
+      errors: {}
     }
   }
 
@@ -64,10 +66,31 @@ export default class CategoryDashboardAdd extends BasePage<{}> {
       this.setState({
         [field]: event.target?.value + ''
       })
+    }
   }
+
+  findFormErrors(): IFormErrors {
+    const {name, selectedParent} = this.state;
+    const newErrors: IFormErrors = {};
+
+    if (!name || name === '') newErrors.name = 'Cannot be blank!';
+    else if (name.length > 30) newErrors.name = 'Name is too long';
+
+    if (!selectedParent || selectedParent === '') {
+      newErrors.selectedParent = "Cannot be blank!";
+    }
+
+    return newErrors;
   }
 
   private handleAddButtonClick() {
+    const newErrors = this.findFormErrors();
+
+    if (Object.keys(newErrors).length > 0) {
+      this.setState({errors: newErrors})
+      return;
+    }
+
     let parentCategoryId: number|null = null;
 
     if (this.state.selectedParent !== '') {
@@ -115,7 +138,12 @@ export default class CategoryDashboardAdd extends BasePage<{}> {
                                     placeholder="Enter category name"
                                     value={ this.state.name }
                                     onChange={ this.onChangeInput("name") }
+                                    isInvalid={ !!this.state.errors.name }
                       />
+
+                      <Form.Control.Feedback type='invalid'>
+                        {this.state.errors.name}
+                      </Form.Control.Feedback>
                     </Form.Group>
 
                     <Form.Group>
@@ -123,12 +151,17 @@ export default class CategoryDashboardAdd extends BasePage<{}> {
                       <Form.Control as="select"
                                     value={ this.state.selectedParent }
                                     onChange={ this.onChangeSelect("selectedParent") }
+                                    isInvalid={ !!this.state.errors.selectedParent }
                       >
                         <option value="">Top level category</option>
                         {
                           this.state.categories.map(category => this.createSelectOptionGroup(category))
                         }
                       </Form.Control>
+
+                      <Form.Control.Feedback type='invalid'>
+                        {this.state.errors.selectedParent}
+                      </Form.Control.Feedback>
                     </Form.Group>
 
                     <Form.Group className="d-grid">
