@@ -121,8 +121,6 @@ export default class UserRegistration extends BasePage<{}> {
           });
         }
 
-        console.log(res);
-
         this.setState({
           message: res.message,
         });

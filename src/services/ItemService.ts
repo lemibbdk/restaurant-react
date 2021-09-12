@@ -143,7 +143,6 @@ export default class ItemService {
 
         apiAsForm('POST', '/item/' + itemId + '/photo', 'administrator', formData)
           .then(res => {
-            console.log(res)
             if (res?.status === 'error') {
               if (Array.isArray(res?.data?.data)) {
                 return resolve({
@@ -198,7 +197,6 @@ export default class ItemService {
     return new Promise<ApiResponse|null>(resolve => {
       api('DELETE', '/item/' + itemId, 'administrator')
         .then(res => {
-          console.log(res)
           if (res?.status !== 'ok') {
             if (res.status === 'login') {
               EventRegister.emit('AUTH_EVENT', 'force_login');

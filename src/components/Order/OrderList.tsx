@@ -42,7 +42,6 @@ export default class OrderList extends BasePage<{}> {
   private getOrders() {
     CartService.getUserOrders()
       .then(res => {
-        console.log(res)
         this.setState({carts: res});
       })
   }

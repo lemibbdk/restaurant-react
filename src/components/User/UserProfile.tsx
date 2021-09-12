@@ -183,7 +183,6 @@ export default class UserProfile extends BasePage<{}> {
         postalAddresses: this.state.postalAddresses
       };
 
-      console.log(data)
       UserService.edit(this.state.userId, data)
         .then(res => {
           if (!res) return this.setState({message: 'Something wrong.'})

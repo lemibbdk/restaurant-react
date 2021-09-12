@@ -87,7 +87,6 @@ export default class ItemDashboardList extends BasePage<{}> {
     if (cid !== undefined) {
       ItemService.getItemsByCategoryId(cid, 'administrator')
         .then(items => {
-          console.log(items)
           items.length === 0 ? this.setState({ items: [] }) : this.setState({ items })
         })
     }

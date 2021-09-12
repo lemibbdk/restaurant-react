@@ -46,7 +46,6 @@ export default class AdministratorDashboardList extends BasePage<{}> {
         if (res.data.errorCode !== 0) {
           return this.setState({message: 'Unable to delete admin'})
         }
-        console.log(res)
         this.loadAdministrators();
       })
   }

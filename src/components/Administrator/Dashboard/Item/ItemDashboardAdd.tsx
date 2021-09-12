@@ -125,7 +125,6 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
     else if (ingredients.length > 100) newErrors.ingredients = 'Ingredients is too long';
 
     const numberValues = [energyValueS, massS, priceS, energyValueL, massL, priceL, energyValueXL, massXL, priceXL];
-    console.log(numberValues)
 
     for (let i = 0; i < numberValues.length; i++) {
       if (!numberValues[i] || numberValues[i] === '') newErrors['numValue'+i] = 'Cannot be blank';
@@ -134,7 +133,6 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
 
     if (!uploadFile) newErrors.file = 'You must upload image.'
 
-    console.log(newErrors)
     return newErrors;
   }
 

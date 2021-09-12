@@ -84,7 +84,6 @@ export default class ItemDashboardPhotoEdit extends BasePage<ItemDashboardPhotoE
     ItemService.deletePhotos(this.getItemId(), this.state.selectedPhotosToDelete)
       .then(res => {
         if (res.success) {
-          console.log(res);
           this.setState({selectedPhotosToDelete: []})
           this.getItem();
         } else {

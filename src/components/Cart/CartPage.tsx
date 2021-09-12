@@ -239,7 +239,6 @@ export default class CartPage extends BasePage<CartPageProperties> {
   }
 
   private onDesiredTimeChange(e: any) {
-    console.log(e)
     const now = new Date();
     const desiredHours = e === null ? '00' : Number(e.split(':')[0]);
     const desiredMinutes = e === null ? '00' : Number(e.split(':')[1]);
@@ -257,7 +256,6 @@ export default class CartPage extends BasePage<CartPageProperties> {
         errorText: ''
       })
 
-      console.log(desired)
     }
 
     this.setState({

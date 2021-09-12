@@ -51,7 +51,6 @@ export default class UserService {
     return new Promise<UserModel | null>(resolve => {
      api('PUT', '/user/' + userId, 'user', data)
        .then(res => {
-         console.log(res)
          if (res?.status !== 'ok') {
            if (res.status === 'login') {
              EventRegister.emit('AUTH_EVENT', 'force_login');
@@ -69,7 +68,6 @@ export default class UserService {
     return new Promise<ApiResponse|null>(resolve => {
       api('DELETE', '/user/' + userId, 'user')
         .then(res => {
-          console.log(res)
           if (res?.status !== 'ok') {
             if (res.status === 'login') {
               EventRegister.emit('AUTH_EVENT', 'force_login');

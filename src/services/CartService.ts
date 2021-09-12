@@ -54,7 +54,6 @@ export default class CartService {
   }
 
   public static setToCart(itemInfoId: number, newQuantity: number, notLastCart: boolean = false, cartId: number = 0) {
-    console.log(cartId)
     if (notLastCart) {
       if (cartId === 0) return;
 
@@ -65,7 +64,6 @@ export default class CartService {
         cartId
       })
         .then(res => {
-          console.log(res)
           if (res.status !== 'ok') return;
           if (res.data.errorCode !== undefined) return;
           EventRegister.emit('CART_EDIT_EVENT', res.data);
@@ -121,10 +119,8 @@ export default class CartService {
 
   public static editCart(cartId: number, data: IEditCart): Promise<IResult> {
     return new Promise<IResult>(resolve => {
-      console.log(data)
       api('PUT', '/cart/' + cartId + '/edit', 'user', data)
         .then(res => {
-            console.log(res)
           if (res.status === 'error') {
             if (Array.isArray(res?.data?.data)) {
               return resolve({

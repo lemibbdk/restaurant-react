@@ -42,7 +42,6 @@ export default class AuthService {
           };
 
           const identity = parseJwt(authToken).id + '';
-          console.log(identity)
 
           saveIdentity('user', identity);
 
@@ -60,7 +59,6 @@ export default class AuthService {
     return new Promise<IRegistrationResult>(resolve => {
       api('POST', '/auth/user/register', "user", data)
         .then(res => {
-          console.log(res);
           if (res?.status === 'error') {
             if (Array.isArray(res?.data.data)) {
               return resolve({
@@ -88,7 +86,6 @@ export default class AuthService {
       password
     }, false)
       .then(res => {
-        console.log(res)
         if (res.status === 'ok') {
           const authToken = res.data?.authToken ?? '';
           const refreshToken = res.data?.refreshToken ?? '';

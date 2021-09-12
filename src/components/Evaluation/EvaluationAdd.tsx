@@ -151,7 +151,7 @@ export default class EvaluationAdd extends BasePage<EvaluationAddProperties> {
                           type="number"
                           min="1"
                           max="5"
-                          placeholder="Enter score here"
+                          placeholder="Enter score here 1-5"
                           value={ this.state.score }
                           onChange={ this.onChangeInput("score") }
                           isInvalid={ !!this.state.errors.score }
