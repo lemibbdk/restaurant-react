@@ -6,6 +6,11 @@ class BasePageProperties {
   match?: any;
 }
 
+export interface IFormErrors {
+    [key: string]: string
+}
+
+
 export { BasePageProperties }
 
 export default abstract class BasePage<Properties extends BasePageProperties> extends React.Component<Properties> {

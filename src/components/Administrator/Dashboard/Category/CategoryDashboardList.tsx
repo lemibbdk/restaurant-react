@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import CategoryService from '../../../../services/CategoryService';
 import { isRoleLoggedIn } from '../../../../api/api';
 import EventRegister from '../../../../api/EventRegister';
+import {Button} from "react-bootstrap";
 
 interface CategoryDashboardListState {
   categories: CategoryModel[];
@@ -45,7 +46,7 @@ export default class CategoryDashboardList extends BasePage<{}> {
         <h1>Categories</h1>
         <div>
           <Link to="/dashboard/category/add" className="btn btn-sm btn-link">
-            Add new category
+            <Button variant="primary">Add new category</Button>
           </Link>
         </div>
         <div>
@@ -77,11 +78,11 @@ export default class CategoryDashboardList extends BasePage<{}> {
               className="btn btn-sm btn-link"
               title="Click here to edit this category"
         >
-          Edit
+          <Button variant="primary">Edit</Button>
         </Link>
 
         <Link to={ "/dashboard/category/feature" + category.categoryId } className="btn btn-sm btn-link">
-          List features
+          <Button variant="info">List features</Button>
         </Link>
       </>
     )

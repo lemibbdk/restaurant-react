@@ -1,4 +1,4 @@
-import BasePage, { BasePageProperties } from '../../../BasePage/BasePage';
+import BasePage, {BasePageProperties, IFormErrors} from '../../../BasePage/BasePage';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
 import React from 'react';
 import ItemService, { IAddItem } from '../../../../services/ItemService';
@@ -35,7 +35,7 @@ interface ItemDashboardAddState {
   message: string;
 
   redirectBackToItems: boolean;
-  errors: IItemErrors;
+  errors: IFormErrors;
 }
 
 // interface IItemErrors {
@@ -52,10 +52,6 @@ interface ItemDashboardAddState {
 //   (priceXL: string): string;
 //   uploadFil: string;
 // }
-
-interface IItemErrors {
-  [key: string]: string
-}
 
 export default class ItemDashboardAdd extends BasePage<ItemDashboardAddProperties> {
   state: ItemDashboardAddState;
@@ -106,12 +102,6 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
       this.setState({
         [field]: event.target.value
       })
-
-      if (!!this.state.errors[field]) {
-        this.setState({
-          errors: {...this.state.errors, [field]: null}
-        })
-      }
     }
   }
 
@@ -123,10 +113,10 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
     }
   }
 
-  findFormErrors() {
+  findFormErrors(): IFormErrors {
     const {name, ingredients, energyValueS, massS, priceS, energyValueL, massL, priceL, energyValueXL, massXL, priceXL,
       uploadFile} = this.state;
-    const newErrors: IItemErrors = {};
+    const newErrors: IFormErrors = {};
 
     if (!name || name === '') newErrors.name = 'Cannot be blank!';
     else if (name.length > 30) newErrors.name = 'Name is too long';
@@ -152,9 +142,7 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
     const newErrors = this.findFormErrors();
 
     if (Object.keys(newErrors).length > 0) {
-      console.log('usao u if')
       this.setState({errors: newErrors})
-
       return;
     }
 
@@ -316,6 +304,10 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
                                         onChange={ this.onChangeInput("massL") }
                                         isInvalid={ !!this.state.errors.numValue4 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue4}
+                          </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Control.Feedback type='invalid'>
