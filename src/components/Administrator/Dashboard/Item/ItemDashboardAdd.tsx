@@ -35,6 +35,26 @@ interface ItemDashboardAddState {
   message: string;
 
   redirectBackToItems: boolean;
+  errors: IItemErrors;
+}
+
+// interface IItemErrors {
+//   name: string;
+//   ingredients: string;
+//   (energyValueS: string): string;
+//   (massS: string): string;
+//   (priceS: string): string;
+//   (energyValueL: string): string;
+//   (massL: string): string;
+//   (priceL: string): string;
+//   (energyValueXL: string): string;
+//   (massXL: string): string;
+//   (priceXL: string): string;
+//   uploadFil: string;
+// }
+
+interface IItemErrors {
+  [key: string]: string
 }
 
 export default class ItemDashboardAdd extends BasePage<ItemDashboardAddProperties> {
@@ -63,7 +83,8 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
 
       message: '',
 
-      redirectBackToItems: false
+      redirectBackToItems: false,
+      errors: {}
     }
   }
 
@@ -85,6 +106,12 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
       this.setState({
         [field]: event.target.value
       })
+
+      if (!!this.state.errors[field]) {
+        this.setState({
+          errors: {...this.state.errors, [field]: null}
+        })
+      }
     }
   }
 
@@ -96,11 +123,46 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
     }
   }
 
+  findFormErrors() {
+    const {name, ingredients, energyValueS, massS, priceS, energyValueL, massL, priceL, energyValueXL, massXL, priceXL,
+      uploadFile} = this.state;
+    const newErrors: IItemErrors = {};
+
+    if (!name || name === '') newErrors.name = 'Cannot be blank!';
+    else if (name.length > 30) newErrors.name = 'Name is too long';
+
+    if (!ingredients || ingredients === '') newErrors.ingredients = 'Cannot be blank!';
+    else if (ingredients.length > 100) newErrors.ingredients = 'Ingredients is too long';
+
+    const numberValues = [energyValueS, massS, priceS, energyValueL, massL, priceL, energyValueXL, massXL, priceXL];
+    console.log(numberValues)
+
+    for (let i = 0; i < numberValues.length; i++) {
+      if (!numberValues[i] || numberValues[i] === '') newErrors['numValue'+i] = 'Cannot be blank';
+      else if (isNaN(Number(numberValues[i]))) newErrors['numValue'+i] = 'Must be a number';
+    }
+
+    if (!uploadFile) newErrors.file = 'You must upload image.'
+
+    console.log(newErrors)
+    return newErrors;
+  }
+
   private handleAddButtonClick() {
+    const newErrors = this.findFormErrors();
+
+    if (Object.keys(newErrors).length > 0) {
+      console.log('usao u if')
+      this.setState({errors: newErrors})
+
+      return;
+    }
+
     if (this.state.uploadFile === null) {
-      return this.setState({
-        message: "Could did not select a file to upload.",
+      this.setState({
+        message: "Please select image.",
       });
+      return
     }
 
     const data: IAddItem = {
@@ -163,7 +225,11 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
                                     placeholder="Enter item name"
                                     value={ this.state.name }
                                     onChange={ this.onChangeInput("name") }
+                                    isInvalid={ !!this.state.errors.name }
                       />
+                      <Form.Control.Feedback type='invalid'>
+                        {this.state.errors.name}
+                      </Form.Control.Feedback>
                     </Form.Group>
 
                     <Form.Group>
@@ -172,7 +238,12 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
                                     placeholder="Enter ingredients"
                                     value={ this.state.ingredients }
                                     onChange={ this.onChangeInput("ingredients") }
+                                    isInvalid={ !!this.state.errors.ingredients }
                       />
+
+                      <Form.Control.Feedback type='invalid'>
+                        {this.state.errors.ingredients}
+                      </Form.Control.Feedback>
                     </Form.Group>
 
                     <Card>
@@ -184,7 +255,12 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
                                         placeholder="Enter energy value"
                                         value={ this.state.energyValueS }
                                         onChange={ this.onChangeInput("energyValueS") }
+                                        isInvalid={ !!this.state.errors.numValue0 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue0}
+                          </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
                           <Form.Label>Mass:</Form.Label>
@@ -192,7 +268,12 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
                                         placeholder="Enter mass"
                                         value={ this.state.massS }
                                         onChange={ this.onChangeInput("massS") }
+                                        isInvalid={ !!this.state.errors.numValue1 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue1}
+                          </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
                           <Form.Label>Price:</Form.Label>
@@ -200,7 +281,12 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
                                         placeholder="Enter price"
                                         value={ this.state.priceS }
                                         onChange={ this.onChangeInput("priceS") }
+                                        isInvalid={ !!this.state.errors.numValue2 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue2}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Card.Body>
                     </Card>
@@ -214,7 +300,13 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
                                         placeholder="Enter energy value"
                                         value={ this.state.energyValueL }
                                         onChange={ this.onChangeInput("energyValueL") }
+                                        isInvalid={ !!this.state.errors.numValue3 }
+
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue3}
+                          </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
                           <Form.Label>Mass:</Form.Label>
@@ -222,15 +314,25 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
                                         placeholder="Enter mass"
                                         value={ this.state.massL }
                                         onChange={ this.onChangeInput("massL") }
+                                        isInvalid={ !!this.state.errors.numValue4 }
                           />
                         </Form.Group>
+
+                        <Form.Control.Feedback type='invalid'>
+                          {this.state.errors.numValue4}
+                        </Form.Control.Feedback>
                         <Form.Group>
                           <Form.Label>Price:</Form.Label>
                           <Form.Control type="text"
                                         placeholder="Enter price"
                                         value={ this.state.priceL }
                                         onChange={ this.onChangeInput("priceL") }
+                                        isInvalid={ !!this.state.errors.numValue5 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue5}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Card.Body>
                     </Card>
@@ -244,7 +346,12 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
                                         placeholder="Enter energy value"
                                         value={ this.state.energyValueXL }
                                         onChange={ this.onChangeInput("energyValueXL") }
+                                        isInvalid={ !!this.state.errors.numValue6 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue6}
+                          </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
                           <Form.Label>Mass:</Form.Label>
@@ -252,7 +359,12 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
                                         placeholder="Enter mass"
                                         value={ this.state.massXL }
                                         onChange={ this.onChangeInput("massXL") }
+                                        isInvalid={ !!this.state.errors.numValue7 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue7}
+                          </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
                           <Form.Label>Price:</Form.Label>
@@ -260,19 +372,29 @@ export default class ItemDashboardAdd extends BasePage<ItemDashboardAddPropertie
                                         placeholder="Enter price"
                                         value={ this.state.priceXL }
                                         onChange={ this.onChangeInput("priceXL") }
+                                        isInvalid={ !!this.state.errors.numValue8 }
                           />
+
+                          <Form.Control.Feedback type='invalid'>
+                            {this.state.errors.numValue8}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Card.Body>
                     </Card>
 
                     <Form.Group>
-                      <b>Item photo</b>
-                      <Form.Label>Article photo:</Form.Label>
+                      <Form.Label>Item photo:</Form.Label>
                       <Form.File
                         custom
                         data-browse="Select file"
                         accept=".png,.jpeg"
-                        onChange={ this.onChangeFile("uploadFile") }/>
+                        onChange={ this.onChangeFile("uploadFile") }
+                        isInvalid={ !!this.state.errors.file }
+                      />
+
+
+                      <p>  {this.state.errors.file} </p>
+
                     </Form.Group>
 
 
