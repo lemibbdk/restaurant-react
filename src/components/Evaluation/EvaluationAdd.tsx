@@ -1,4 +1,4 @@
-import BasePage, { BasePageProperties } from '../BasePage/BasePage';
+import BasePage, {BasePageProperties, IFormErrors} from '../BasePage/BasePage';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
 import React from 'react';
 import { Redirect } from 'react-router-dom';
@@ -21,6 +21,7 @@ interface EvaluationAddState {
   redirectBackToOrders: boolean;
   isValid: boolean;
   cartId: number | null;
+  errors: IFormErrors;
 }
 
 export default class EvaluationAdd extends BasePage<EvaluationAddProperties> {
@@ -35,7 +36,8 @@ export default class EvaluationAdd extends BasePage<EvaluationAddProperties> {
       message: '',
       redirectBackToOrders: false,
       isValid: false,
-      cartId: null
+      cartId: null,
+      errors: {}
     }
   }
 
@@ -54,7 +56,7 @@ export default class EvaluationAdd extends BasePage<EvaluationAddProperties> {
     this.checkUserOrder()
   }
 
-  private checkUserOrder() {
+  private checkUserOrder(): void {
     CartService.getUserOrders()
       .then(res => {
         res.forEach(el => {
@@ -79,9 +81,30 @@ export default class EvaluationAdd extends BasePage<EvaluationAddProperties> {
     }
   }
 
+  findFormErrors(): IFormErrors {
+    const {score, remark} = this.state;
+    const newErrors: IFormErrors = {};
+
+    if (!score || score === '') newErrors.score = 'Cannot be blank!';
+    else if (!score.match('^(1|2|3|4|5)$')) newErrors.score = 'Score must be one of this [1|2|3|4|5]';
+
+    if (!remark || remark === '') {
+      newErrors.remark = "Cannot be blank!";
+    }
+
+    return newErrors;
+  }
+
   private handleAddButton() {
     if (this.getOrderId === null) {
       return this.setState({message: 'Wrong order number'})
+    }
+
+    const newErrors = this.findFormErrors();
+
+    if (Object.keys(newErrors).length > 0) {
+      this.setState({errors: newErrors})
+      return;
     }
 
     const data = {
@@ -131,7 +154,12 @@ export default class EvaluationAdd extends BasePage<EvaluationAddProperties> {
                           placeholder="Enter score here"
                           value={ this.state.score }
                           onChange={ this.onChangeInput("score") }
+                          isInvalid={ !!this.state.errors.score }
                         />
+
+                        <Form.Control.Feedback type='invalid'>
+                          {this.state.errors.score}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -144,7 +172,12 @@ export default class EvaluationAdd extends BasePage<EvaluationAddProperties> {
                           placeholder="Enter remark here..."
                           value={ this.state.remark }
                           onChange={ this.onChangeInput("remark") }
+                          isInvalid={ !!this.state.errors.remark }
                         />
+
+                        <Form.Control.Feedback type='invalid'>
+                          {this.state.errors.remark}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
