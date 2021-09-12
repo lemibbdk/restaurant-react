@@ -96,7 +96,7 @@ export default class ItemDashboardPhotoEdit extends BasePage<ItemDashboardPhotoE
   private handleUploadPhotos() {
     if (this.state.uploadFile === null) {
       return this.setState({
-        message: "Could did not select a file to upload.",
+        message: "Select a file to upload.",
       });
     }
 
@@ -162,7 +162,7 @@ export default class ItemDashboardPhotoEdit extends BasePage<ItemDashboardPhotoE
 
         {
           this.state.message
-            ? (<p className="mt-3">{ this.state.message }</p>)
+            ? (<p className="mt-3 error-text">{ this.state.message }</p>)
             : ""
         }
       </>

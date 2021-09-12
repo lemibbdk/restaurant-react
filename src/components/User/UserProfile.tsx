@@ -1,4 +1,4 @@
-import BasePage from '../BasePage/BasePage';
+import BasePage, {IFormErrors} from '../BasePage/BasePage';
 import CartModel from '../../models/CartModel';
 import UserService from '../../services/UserService';
 import { getIdentity } from '../../api/api';
@@ -17,6 +17,7 @@ interface UserProfileState {
   carts: CartModel[];
   showEditProfileForm: boolean;
   message: string;
+  errors: IFormErrors;
 }
 
 export default class UserProfile extends BasePage<{}> {
@@ -35,7 +36,8 @@ export default class UserProfile extends BasePage<{}> {
       isActive: false,
       carts: [],
       showEditProfileForm: false,
-      message: ''
+      message: '',
+      errors: {}
     }
   }
 
@@ -120,10 +122,58 @@ export default class UserProfile extends BasePage<{}> {
     this.setState({ postalAddresses: values });
   }
 
+  findFormErrors(): IFormErrors {
+    const {email, password, forename, surname, postalAddresses} = this.state;
+    const newErrors: IFormErrors = {};
+
+    if (!email || email === '') newErrors.email = 'Cannot be blank!';
+    else if (email.length > 30) newErrors.email = 'Name is too long';
+
+    if (!password || password === '') newErrors.password = 'Cannot be blank!';
+    else if (password.length > 30) newErrors.password = 'Name is too long';
+
+    if (!forename || forename === '') newErrors.forename = 'Cannot be blank!';
+    else if (forename.length > 30) newErrors.forename = 'Name is too long';
+
+    if (!surname || surname === '') newErrors.surname = 'Cannot be blank!';
+    else if (surname.length > 30) newErrors.surname = 'Name is too long';
+
+    if (postalAddresses.length === 0) {
+      this.setState({message: 'Must give at least one address.'})
+      newErrors.postalAddresses = 'Give one address';
+    } else {
+      let errorCounter = 0;
+      postalAddresses.forEach(address => {
+        if (address.address == '' || address.phoneNumber === '') {
+          this.setState({message: 'Address fields should not be empty.'})
+          newErrors.postalAddresses = 'Address fields should not be empty.';
+          errorCounter++;
+        }
+
+        if (errorCounter === 0) {
+          this.setState({message: ''});
+          delete newErrors.postalAddresses;
+        }
+      })
+
+
+    }
+
+    return newErrors;
+  }
+
   private handleEditButton(type: 'edit' | 'cancel' | 'save') {
     if (type === 'edit') return this.setState({showEditProfileForm: true});
     if (type === 'cancel') return this.setState({showEditProfileForm: false});
     if (type === 'save') {
+      this.setState({errors: {}, password: ''});
+      const newErrors = this.findFormErrors();
+
+      if (Object.keys(newErrors).length > 0) {
+        this.setState({errors: newErrors})
+        return;
+      }
+
       const data = {
         email: this.state.email,
         password: this.state.password,
@@ -213,7 +263,12 @@ export default class UserProfile extends BasePage<{}> {
                 placeholder="Enter your e-mail here..."
                 value={ this.state.email }
                 onChange={ this.onChangeInput("email") }
+                isInvalid={ !!this.state.errors.email }
               />
+
+              <Form.Control.Feedback type='invalid'>
+                {this.state.errors.email}
+              </Form.Control.Feedback>
             </Form.Group>
           </Col>
 
@@ -225,7 +280,12 @@ export default class UserProfile extends BasePage<{}> {
                 placeholder="Enter your password here..."
                 value={ this.state.password }
                 onChange={ this.onChangeInput("password") }
+                isInvalid={ !!this.state.errors.password }
               />
+
+              <Form.Control.Feedback type='invalid'>
+                {this.state.errors.password}
+              </Form.Control.Feedback>
             </Form.Group>
           </Col>
 
@@ -237,7 +297,12 @@ export default class UserProfile extends BasePage<{}> {
                 placeholder="Enter your forename here..."
                 value={ this.state.forename }
                 onChange={ this.onChangeInput("forename") }
+                isInvalid={ !!this.state.errors.forename }
               />
+
+              <Form.Control.Feedback type='invalid'>
+                {this.state.errors.forename}
+              </Form.Control.Feedback>
             </Form.Group>
           </Col>
 
@@ -249,7 +314,12 @@ export default class UserProfile extends BasePage<{}> {
                 placeholder="Enter your surname here..."
                 value={ this.state.surname }
                 onChange={ this.onChangeInput("surname") }
+                isInvalid={ !!this.state.errors.surname }
               />
+
+              <Form.Control.Feedback type='invalid'>
+                {this.state.errors.surname}
+              </Form.Control.Feedback>
             </Form.Group>
           </Col>
 
@@ -277,7 +347,11 @@ export default class UserProfile extends BasePage<{}> {
         </Row>
 
         {
-          this.state.message
+          this.state.message !== '' ?
+
+          <p className="error-text">this.state.message</p>
+            :
+            null
         }
       </Form>
     )
