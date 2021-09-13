@@ -99,6 +99,11 @@ export default class CartService {
                 success: false,
                 message: error,
               });
+            } else if (typeof res?.data?.data === 'string' || res?.data?.data instanceof String) {
+              return resolve({
+                success: false,
+                message: res?.data?.data
+              })
             }
 
             EventRegister.emit('ORDER_EVENT', 'order.failed', res.data);
