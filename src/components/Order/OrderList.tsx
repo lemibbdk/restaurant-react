@@ -13,6 +13,7 @@ import ReactTooltip from 'react-tooltip';
 interface OrderListState {
   carts: CartModel[];
   displayedCart: CartModel | null;
+  errorText: string;
 }
 
 export default class OrderList extends BasePage<{}> {
@@ -24,7 +25,8 @@ export default class OrderList extends BasePage<{}> {
 
     this.state = {
       carts: [],
-      displayedCart: null
+      displayedCart: null,
+      errorText: ''
     }
 
     this.wrapper = React.createRef();
@@ -51,7 +53,9 @@ export default class OrderList extends BasePage<{}> {
     return date.toLocaleDateString() + " " + date.toLocaleTimeString();
   }
 
-  private cancelOrder(cartId: number) {
+  private cancelOrder(cartId: number, status: string) {
+    if (status === 'accepted') return this.setState({})
+
     CartService.setOrderStatus(cartId, 'rejected', 'user');
 
     this.setState((state: OrderListState) => {
@@ -87,7 +91,7 @@ export default class OrderList extends BasePage<{}> {
           {
             this.state.carts.map(cart => (
               <tr key={"order-cart-" + cart.cartId}>
-                <td>{ cart.order?.orderId }</td>
+                <td>{ cart.cartId }</td>
                 <td>{ this.getLocalDate(cart.order?.createdAt + "") }</td>
                 <td>&euro; {cart.itemInfos.map(el => el.quantity * el.itemInfo.price)
                   .reduce((sum, v) => sum + v, 0)
@@ -103,7 +107,7 @@ export default class OrderList extends BasePage<{}> {
                     data-tip
                     data-for={"tooltip-cancel-" + cart.cartId}
                     className={ cart.order?.status !== 'pending' ? 'd-none' : '' }
-                    onClick={ () => this.cancelOrder(cart.cartId) } >
+                    onClick={ () => this.cancelOrder(cart.cartId, cart.order?.status as string) } >
                     <i className="bi bi-x-square-fill" />
                   </Button>
 
@@ -160,6 +164,8 @@ export default class OrderList extends BasePage<{}> {
           }
           </tbody>
         </table>
+
+        <p className="error-text"> { this.state.errorText } </p>
 
         {
           this.state.displayedCart !== null

@@ -144,7 +144,7 @@ export default class UserProfile extends BasePage<{}> {
     } else {
       let errorCounter = 0;
       postalAddresses.forEach(address => {
-        if (address.address == '' || address.phoneNumber === '') {
+        if (address.address === '' || address.phoneNumber === '') {
           this.setState({message: 'Address fields should not be empty.'})
           newErrors.postalAddresses = 'Address fields should not be empty.';
           errorCounter++;

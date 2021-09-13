@@ -151,6 +151,7 @@ export default class ItemPage extends BasePage<ItemPageProperties> {
                                       </InputGroup.Prepend>
                                       <Form.Control
                                         type="number"
+                                        className="w-auto"
                                         min="1"
                                         max="100"
                                         step="1"
