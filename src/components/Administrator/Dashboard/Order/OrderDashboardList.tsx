@@ -92,8 +92,9 @@ export default class OrderDashboardList extends BasePage<{}> {
           <h1 className="text-center">All Orders</h1>
         </div>
 
-        <table className="table table-sm">
-          <thead>
+        <div className="table-container-responsive">
+          <table className="table table-sm">
+            <thead>
             <tr>
               <th>#ID</th>
               <th>Date and Time</th>
@@ -102,53 +103,54 @@ export default class OrderDashboardList extends BasePage<{}> {
               <th>Status</th>
               <th>Options</th>
             </tr>
-          </thead>
-          <tbody>
-          {
-            this.state.carts.map(cart => (
-              <tr key={"order-cart-" + cart.cartId}>
-                <td>{ cart.order?.orderId }</td>
-                <td>{ this.getLocalDate(cart.order?.createdAt + "") }</td>
-                <td>&euro; {cart.itemInfos.map(el => el.quantity * el.itemInfo.price)
-                  .reduce((sum, v) => sum + v, 0)
-                  .toFixed(2)
-                }
-                </td>
-                <td>{ cart.user.email }</td>
-                <td>
-                  <InputGroup>
-                    <Form.Control
-                      as="select"
-                      value={ cart.order?.status }
-                      onChange={ this.getChangeOrderStatusHandler(cart.cartId) }
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="rejected">rejected</option>
-                      <option value="accepted">Accepted</option>
-                      <option value="completed">Completed</option>
-                    </Form.Control>
-                    <InputGroup.Append>
-                      <Button
-                        disabled={ !this.state.cartStatusSaveButtonEnabled.get(cart.cartId) }
-                        variant="primary"
-                        onClick={() => this.setNewOrderStatus(cart.cartId)} >
-                      Set status
-                      </Button>
-                    </InputGroup.Append>
-                  </InputGroup>
-                </td>
-                <td>
-                  <Button
-                    variant="primary"
-                    onClick={ () => this.setState({ displayedCart: cart }) }>
-                    Show cart
-                  </Button>
-                </td>
-              </tr>
-            ))
-          }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+            {
+              this.state.carts.map(cart => (
+                <tr key={"order-cart-" + cart.cartId}>
+                  <td>{ cart.order?.orderId }</td>
+                  <td>{ this.getLocalDate(cart.order?.createdAt + "") }</td>
+                  <td>&euro; {cart.itemInfos.map(el => el.quantity * el.itemInfo.price)
+                    .reduce((sum, v) => sum + v, 0)
+                    .toFixed(2)
+                  }
+                  </td>
+                  <td>{ cart.user.email }</td>
+                  <td>
+                    <InputGroup>
+                      <Form.Control
+                        as="select"
+                        value={ cart.order?.status }
+                        onChange={ this.getChangeOrderStatusHandler(cart.cartId) }
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="rejected">rejected</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="completed">Completed</option>
+                      </Form.Control>
+                      <InputGroup.Append>
+                        <Button
+                          disabled={ !this.state.cartStatusSaveButtonEnabled.get(cart.cartId) }
+                          variant="primary"
+                          onClick={() => this.setNewOrderStatus(cart.cartId)} >
+                          Set status
+                        </Button>
+                      </InputGroup.Append>
+                    </InputGroup>
+                  </td>
+                  <td>
+                    <Button
+                      variant="primary"
+                      onClick={ () => this.setState({ displayedCart: cart }) }>
+                      Show cart
+                    </Button>
+                  </td>
+                </tr>
+              ))
+            }
+            </tbody>
+          </table>
+        </div>
 
         {
           this.state.displayedCart !== null

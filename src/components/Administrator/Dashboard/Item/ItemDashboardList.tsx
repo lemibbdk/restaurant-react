@@ -172,48 +172,50 @@ export default class ItemDashboardList extends BasePage<{}> {
         }
 
         <h1>Category items</h1>
-        <table className="table table-sm">
-          <thead>
-          <tr>
-            <th>Photo</th>
-            <th>#ID</th>
-            <th>Name</th>
-            <th>Ingredients</th>
-            <th>Options</th>
-          </tr>
-          </thead>
-          <tbody>
-          {
-            this.state.items.map(el => (
-              <tr key={"item-" + el.itemId}>
-                <td> <img alt={ el.name }
-                          src={ ItemService.getThumbPath(AppConfiguration.API_URL + "/" + el.photos[0].imagePath ) }
-                          className="item-image"
-                          width={100}/>
-                </td>
-                <td>{el.itemId}</td>
-                <td>{el.name}</td>
-                <td>{el.ingredients}</td>
-                <td>
-                  <Link className="nav-link" to={"/dashboard/" + this.state.selectedCategory?.categoryId + "/item/edit/" + el.itemId}>
-                    <Button variant="primary">
-                      Edit item
+        <div className="table-container-responsive">
+          <table className="table table-sm">
+            <thead>
+            <tr>
+              <th>Photo</th>
+              <th>#ID</th>
+              <th>Name</th>
+              <th>Ingredients</th>
+              <th>Options</th>
+            </tr>
+            </thead>
+            <tbody>
+            {
+              this.state.items.map(el => (
+                <tr key={"item-" + el.itemId}>
+                  <td> <img alt={ el.name }
+                            src={ ItemService.getThumbPath(AppConfiguration.API_URL + "/" + el.photos[0].imagePath ) }
+                            className="item-image"
+                            width={100}/>
+                  </td>
+                  <td>{el.itemId}</td>
+                  <td>{el.name}</td>
+                  <td>{el.ingredients}</td>
+                  <td>
+                    <Link className="nav-link" to={"/dashboard/" + this.state.selectedCategory?.categoryId + "/item/edit/" + el.itemId}>
+                      <Button variant="primary">
+                        Edit item
+                      </Button>
+                    </Link>
+                    <Link className="nav-link" to={"/dashboard/" + this.state.selectedCategory?.categoryId + "/item/edit/" + el.itemId + '/photo'}>
+                      <Button variant="primary">
+                        Edit photo
+                      </Button>
+                    </Link>
+                    <Button variant="danger" onClick={ this.deleteButtonHandler(el.itemId) }>
+                      Delete item
                     </Button>
-                  </Link>
-                  <Link className="nav-link" to={"/dashboard/" + this.state.selectedCategory?.categoryId + "/item/edit/" + el.itemId + '/photo'}>
-                    <Button variant="primary">
-                      Edit photo
-                    </Button>
-                  </Link>
-                  <Button variant="danger" onClick={ this.deleteButtonHandler(el.itemId) }>
-                    Delete item
-                  </Button>
-                </td>
-              </tr>
-            ))
-          }
-          </tbody>
-        </table>
+                  </td>
+                </tr>
+              ))
+            }
+            </tbody>
+          </table>
+        </div>
       </>
     );
   }
