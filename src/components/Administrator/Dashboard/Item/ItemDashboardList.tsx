@@ -6,7 +6,8 @@ import CategoryService from '../../../../services/CategoryService';
 import { Button, Form, FormGroup } from 'react-bootstrap';
 import React from 'react';
 import { AppConfiguration } from '../../../../config/app.config';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import ConfirmAction from '../../../Misc/ConfirmAction';
 
 interface ItemDashboardListState {
   // categories: Array<CategoryModel[]>;
@@ -16,7 +17,9 @@ interface ItemDashboardListState {
   items: ItemModel[];
   message: string;
   forms: JSX.Element[];
-  redirectBackToItems: boolean;
+  showDeleteDialog: boolean;
+  deleteDialogYesHandler: () => void;
+  deleteDialogNoHandler: () => void;
 }
 
 export default class ItemDashboardList extends BasePage<{}> {
@@ -32,7 +35,13 @@ export default class ItemDashboardList extends BasePage<{}> {
       forms: [],
       message: '',
       items: [],
-      redirectBackToItems: false
+      showDeleteDialog: false,
+      deleteDialogYesHandler: () => {},
+      deleteDialogNoHandler: () => {
+        this.setState({
+          showDeleteDialog: false,
+        })
+      },
     }
   }
 
@@ -108,21 +117,35 @@ export default class ItemDashboardList extends BasePage<{}> {
   }
 
   private deleteButtonHandler(itemId: number) {
-    ItemService.delete(itemId)
-      .then(res => {
-        if (res !== null) {
-          this.setState({redirectBackToItems: true})
+    return () => {
+      this.setState({
+        showDeleteDialog: true,
+        deleteDialogYesHandler: () => {
+          ItemService.delete(itemId)
+            .then(res => {
+              if (res !== null) {
+                const filtered = this.state.items.filter(el => el.itemId !== itemId);
+                this.setState({items: filtered, showDeleteDialog: false});
+              }
+            })
         }
       })
+    }
   }
 
   renderMain(): JSX.Element {
-    if (this.state.redirectBackToItems) {
-      return ( <Redirect to="/item" /> );
-    }
-
     return (
       <>
+        {
+          this.state.showDeleteDialog ? (
+            <ConfirmAction
+              title="Delete item"
+              message="Are you sure that you want delete item?"
+              yesHandler={ this.state.deleteDialogYesHandler }
+              noHandler={ this.state.deleteDialogNoHandler } />
+          ): ""
+        }
+
         <FormGroup>
           <Form.Control as="select" onChange={this.handleCategorySelectChange.bind(this)} >
             <option value="0">Select category</option>
@@ -182,7 +205,7 @@ export default class ItemDashboardList extends BasePage<{}> {
                       Edit photo
                     </Button>
                   </Link>
-                  <Button variant="danger" onClick={() => this.deleteButtonHandler(el.itemId)}>
+                  <Button variant="danger" onClick={ this.deleteButtonHandler(el.itemId) }>
                     Delete item
                   </Button>
                 </td>

@@ -80,10 +80,6 @@ export default class CategoryDashboardList extends BasePage<{}> {
         >
           <Button variant="primary">Edit</Button>
         </Link>
-
-        <Link to={ "/dashboard/category/feature" + category.categoryId } className="btn btn-sm btn-link">
-          <Button variant="info">List features</Button>
-        </Link>
       </>
     )
   }
