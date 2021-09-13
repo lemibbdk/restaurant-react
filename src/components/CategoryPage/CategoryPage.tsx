@@ -160,12 +160,12 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
           this.state.subCategories.length > 0
             ? (
               <>
-                {this.props.match?.params.cid ? <p>Podkategorije:</p> : ""}
+                {this.props.match?.params.cid ? <p>Subcategories:</p> : ""}
                 <ul>
                   { this.state.subCategories.map(category => (
                     <li key={ 'category-link-' + category.categoryId }>
                       <Link to={ '/category/' + category.categoryId  } >
-                        Podkategorija { category.name }
+                        { category.name }
                       </Link>
                     </li>
                   )) }

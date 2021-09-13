@@ -1,6 +1,6 @@
 import BasePage, { BasePageProperties } from '../BasePage/BasePage';
 import CartModel from '../../models/CartModel';
-import { Button, Card, Form, FormControl, InputGroup } from 'react-bootstrap';
+import { Button, Card, Col, Form, FormControl, InputGroup } from 'react-bootstrap';
 import EventRegister from '../../api/EventRegister';
 import CartService from '../../services/CartService';
 import ItemService from '../../services/ItemService';
@@ -386,156 +386,160 @@ export default class CartPage extends BasePage<CartPageProperties> {
             </Card.Title>
           </Card.Header>
           <Card.Body>
-            <table className="table table-sm cart-table">
-              <thead>
-              <tr>
-                <th colSpan={2}>Item</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Sum</th>
-                <th>Options</th>
-              </tr>
-              </thead>
-              <tbody>
-              { this.state.cart.itemInfos.map(el => (
-                <tr key={ "cart-item-" + el.itemInfoId }>
-                  <td>
-                    <img alt={ el.itemInfo.item?.name }
-                         src={ ItemService.getThumbPath(AppConfiguration.API_URL + "/" + el.itemInfo.item?.photos[0].imagePath ) }
-                         className="item-image" />
-                  </td>
-                  <td>
-                    <b className="h5">{ el.itemInfo.item?.name }</b><br />
-                    <small>({ el.itemInfo.item?.category?.name })</small>
-                  </td>
-                  <td>
-                    &euro; { Number(el.itemInfo.price).toFixed(2) }
-                  </td>
-                  <td>
-                    <InputGroup>
+            <div className="table-container-responsive">
+              <table className="table table-sm cart-table">
+                <thead>
+                <tr>
+                  <th colSpan={2}>Item</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Sum</th>
+                  <th>Options</th>
+                </tr>
+                </thead>
+                <tbody>
+                { this.state.cart.itemInfos.map(el => (
+                  <tr key={ "cart-item-" + el.itemInfoId }>
+                    <Col sm={12}>
+                      <td >
+                        <img alt={ el.itemInfo.item?.name }
+                             src={ ItemService.getThumbPath(AppConfiguration.API_URL + "/" + el.itemInfo.item?.photos[0].imagePath ) }
+                             className="item-image" />
+                      </td>
+                    </Col>
+                    <td>
+                      <b className="h5">{ el.itemInfo.item?.name }</b><br />
+                      <small>({ el.itemInfo.item?.category?.name })</small>
+                    </td>
+                    <td>
+                      &euro; { Number(el.itemInfo.price).toFixed(2) }
+                    </td>
+                    <td>
+                      <InputGroup>
+                        <Form.Control
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="1"
+                          value={ el.quantity }
+                          onChange={ this.onChangeQuantityInput(el.cartItemId) } />
+                        <InputGroup.Append>
+                          {
+                            !this.state.editing ?
+                              <Button variant="primary"
+                                      onClick={ this.getUpdateQuantityHandler(el.cartItemId) }>
+                                Update
+                              </Button>
+                              :
+                              ""
+                          }
+                        </InputGroup.Append>
+                      </InputGroup>
+                    </td>
+                    <td>
+                      &euro; { Number(el.itemInfo.price * el.quantity).toFixed(2) }
+                    </td>
+                    <td>
+                      <Button variant="danger"
+                              disabled={this.state.editing && this.state.cart?.itemInfos.length === 1}
+                              onClick={ this.getDeleteHandler(el.itemInfoId) }>
+                        Delete
+                      </Button>
+                    </td>
+                  </tr>
+                )) }
+                <tr>
+                  <td colSpan={3}>
+                    <InputGroup className="h-100">
+                      <InputGroup.Text>
+                        Select delivery address
+                      </InputGroup.Text>
                       <Form.Control
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="1"
-                        value={ el.quantity }
-                        onChange={ this.onChangeQuantityInput(el.cartItemId) } />
-                      <InputGroup.Append>
+                        as="select"
+                        value={ this.state.selectedAddress }
+                        onChange={ this.setState }
+                      >
                         {
-                          !this.state.editing ?
-                            <Button variant="primary"
-                                    onClick={ this.getUpdateQuantityHandler(el.cartItemId) }>
-                              Update
-                            </Button>
-                            :
-                            ""
+                          this.state.userAddresses.map((el) => (
+                            <option key={el.postalAddressId} value={el.postalAddressId}> { el.address } </option>
+                          ))
                         }
-                      </InputGroup.Append>
+
+                      </Form.Control>
                     </InputGroup>
                   </td>
-                  <td>
-                    &euro; { Number(el.itemInfo.price * el.quantity).toFixed(2) }
+                </tr>
+                <tr>
+                  <td colSpan={3}>
+                    <InputGroup className="h-100">
+                      <InputGroup.Text>
+                        Select desired delivery time
+                      </InputGroup.Text>
+                      <TimePicker
+                        value={this.state.desiredTime}
+                        // minTime={ this.getMinTime() }
+                        maxTime="23:59"
+                        onChange={(e) => this.onDesiredTimeChange(e)}
+                      />
+                    </InputGroup>
+                    <span className="error-text">{this.state.errorText}</span>
                   </td>
-                  <td>
-                    <Button variant="danger"
-                            disabled={this.state.editing && this.state.cart?.itemInfos.length === 1}
-                            onClick={ this.getDeleteHandler(el.itemInfoId) }>
-                      Delete
-                    </Button>
+                  <td colSpan={3}>
+                    <InputGroup>
+                      <InputGroup.Prepend className="d-flex">
+                        <InputGroup.Text>Footnote</InputGroup.Text>
+                      </InputGroup.Prepend>
+                      <FormControl
+                        as="textarea"
+                        aria-label="With textarea"
+                        placeholder="Insert footnote here"
+                        value={this.state.footnote}
+                        onChange={this.updateFootnoteChange("footnote")}
+                      />
+                    </InputGroup>
                   </td>
                 </tr>
-              )) }
-              <tr>
-                <td colSpan={3}>
-                  <InputGroup className="h-100">
-                    <InputGroup.Text>
-                      Select delivery address
-                    </InputGroup.Text>
-                    <Form.Control
-                      as="select"
-                      value={ this.state.selectedAddress }
-                      onChange={ this.setState }
-                    >
-                      {
-                        this.state.userAddresses.map((el) => (
-                          <option key={el.postalAddressId} value={el.postalAddressId}> { el.address } </option>
-                        ))
-                      }
-
-                    </Form.Control>
-                  </InputGroup>
-                </td>
-              </tr>
-              <tr>
-                <td colSpan={3}>
-                  <InputGroup className="h-100">
-                    <InputGroup.Text>
-                      Select desired delivery time
-                    </InputGroup.Text>
-                    <TimePicker
-                      value={this.state.desiredTime}
-                      // minTime={ this.getMinTime() }
-                      maxTime="23:59"
-                      onChange={(e) => this.onDesiredTimeChange(e)}
-                    />
-                  </InputGroup>
-                  <span className="error-text">{this.state.errorText}</span>
-                </td>
-                <td colSpan={3}>
-                  <InputGroup>
-                    <InputGroup.Prepend className="d-flex">
-                      <InputGroup.Text>Footnote</InputGroup.Text>
-                    </InputGroup.Prepend>
-                    <FormControl
-                      as="textarea"
-                      aria-label="With textarea"
-                      placeholder="Insert footnote here"
-                      value={this.state.footnote}
-                      onChange={this.updateFootnoteChange("footnote")}
-                    />
-                  </InputGroup>
-                </td>
-              </tr>
-              </tbody>
-              <tfoot>
-              <tr>
-                <td colSpan={4}> </td>
-                <td>
-                  &euro; {
-                  this.state.cart.itemInfos
-                    .map(el => el.itemInfo.price * el.quantity)
-                    .reduce((sum, value) => sum + value, 0)
-                    .toFixed(2)
-                }
-                </td>
-                <td>
-                  {
-                    this.state.cart.itemInfos.length > 0 && !this.state.editing ? (
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={ () => this.makeOrderHandler() }
-                        disabled={this.state.errorText?.length > 0}
-                      >
-                        Make order
-                      </Button>
-                    ): this.state.cart.itemInfos.length > 0 && this.state.editing ? (
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={ () => this.editOrderHandler() }
-                        disabled={this.state.errorText?.length > 0}
-                      >
-                        Submit
-                      </Button>
-                    ) : null
-
-
+                </tbody>
+                <tfoot>
+                <tr>
+                  <td colSpan={4}> </td>
+                  <td>
+                    &euro; {
+                    this.state.cart.itemInfos
+                      .map(el => el.itemInfo.price * el.quantity)
+                      .reduce((sum, value) => sum + value, 0)
+                      .toFixed(2)
                   }
-                </td>
-              </tr>
-              </tfoot>
-            </table>
+                  </td>
+                  <td>
+                    {
+                      this.state.cart.itemInfos.length > 0 && !this.state.editing ? (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={ () => this.makeOrderHandler() }
+                          disabled={this.state.errorText?.length > 0}
+                        >
+                          Make order
+                        </Button>
+                      ): this.state.cart.itemInfos.length > 0 && this.state.editing ? (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={ () => this.editOrderHandler() }
+                          disabled={this.state.errorText?.length > 0}
+                        >
+                          Submit
+                        </Button>
+                      ) : null
+
+
+                    }
+                  </td>
+                </tr>
+                </tfoot>
+              </table>
+            </div>
           </Card.Body>
         </Card>
       </>
