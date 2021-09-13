@@ -160,8 +160,17 @@ export default class CartPage extends BasePage<CartPageProperties> {
     this.setState({cart: data })
   }
 
+  private checkTime() {
+    const now = new Date;
+
+    if (now.getHours() === 23 && now.getMinutes() >= 15)
+      this.setState({errorText: "Can't make order in last 45 minutes of day."})
+  }
+
   componentDidMount() {
     this.getUserData();
+
+    this.checkTime();
 
     if (this.getCartEditId()) {
       this.getEditCart()
@@ -272,24 +281,15 @@ export default class CartPage extends BasePage<CartPageProperties> {
   }
 
   private makeOrderHandler() {
-    if (this.state.cart === null) return;
-    if (this.state.cart.itemInfos.length === 0) return;
+    CartService.makeOrder(this.state.desiredDeliveryDate, this.state.footnote, this.state.selectedAddress)
+      .then(res => {
+        if (!res.success) {
+          this.setState({ errorText: res.message })
+          return
+        }
 
-    this.setState({
-      showMakeOrderDialog: true,
-      makeOrderDialogYesHandler: () => {
-        CartService.makeOrder(this.state.desiredDeliveryDate, this.state.footnote, this.state.selectedAddress)
-          .then(res => {
-            if (!res.success) {
-              this.setState({ errorText: res.message })
-            }
-          })
-        this.setState({
-          showMakeOrderDialog: false,
-          cart: null
-        });
-      }
-    });
+        this.getCartData();
+      })
   }
 
   private editOrderHandler() {
@@ -311,6 +311,7 @@ export default class CartPage extends BasePage<CartPageProperties> {
             }
           }
 
+          console.log(data)
           CartService.editCart(this.state.cart.cartId, data)
             .then(res => {
               if (!res.success) {
@@ -514,7 +515,7 @@ export default class CartPage extends BasePage<CartPageProperties> {
                         variant="primary"
                         size="sm"
                         onClick={ () => this.makeOrderHandler() }
-                        disabled={this.state.errorText.length > 0}
+                        disabled={this.state.errorText?.length > 0}
                       >
                         Make order
                       </Button>
@@ -523,11 +524,13 @@ export default class CartPage extends BasePage<CartPageProperties> {
                         variant="primary"
                         size="sm"
                         onClick={ () => this.editOrderHandler() }
-                        disabled={this.state.errorText.length > 0}
+                        disabled={this.state.errorText?.length > 0}
                       >
                         Submit
                       </Button>
-                    ) : ""
+                    ) : null
+
+
                   }
                 </td>
               </tr>
