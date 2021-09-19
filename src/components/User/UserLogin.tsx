@@ -100,7 +100,7 @@ export default class UserLogin extends BasePage<{}> {
         <Col sm={12} md={{ span: 6, offset: 3 }} lg={{ span: 4, offset: 4 }}>
           <Card>
             <Card.Body>
-              <Card.Title>
+              <Card.Title className="text-center">
                 <b>User Login</b>
               </Card.Title>
               <Card.Text as="div">
@@ -123,8 +123,8 @@ export default class UserLogin extends BasePage<{}> {
                     />
                   </Form.Group>
 
-                  <Form.Group>
-                    <Button variant="primary" className="mt-3"
+                  <Form.Group className="d-flex justify-content-center">
+                    <Button variant="primary" className="mt-3 w-50"
                             onClick= { () => this.handleLogInButtonClick() } >
                       Log in
                     </Button>

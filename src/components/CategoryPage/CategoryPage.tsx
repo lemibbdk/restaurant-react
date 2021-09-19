@@ -5,7 +5,7 @@ import CategoryService from '../../services/CategoryService';
 import EventRegister from '../../api/EventRegister';
 import ItemModel from '../../models/ItemModel';
 import ItemService from '../../services/ItemService';
-import { Button, CardDeck } from 'react-bootstrap';
+import { Breadcrumb, CardDeck } from 'react-bootstrap';
 import Item from '../Item/Item';
 import './CategoryPage.sass';
 
@@ -20,10 +20,11 @@ class CategoryPageProperties extends BasePageProperties {
 class CategoryPageState {
   title: string = '';
   subCategories: CategoryModel[] = [];
-  showBackButton: boolean = false;
   parentCategoryId: number | null = null;
+  parentCategory: CategoryModel | null = null;
   isUserLoggedIn: boolean = true;
   items: ItemModel[] = [];
+  categoryTree: CategoryModel[];
 }
 
 export default class CategoryPage extends BasePage<CategoryPageProperties> {
@@ -35,10 +36,11 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
     this.state = {
       title: '',
       subCategories: [],
-      showBackButton: false,
       parentCategoryId: null,
+      parentCategory: null,
       isUserLoggedIn: true,
-      items: []
+      items: [],
+      categoryTree: []
     }
   }
 
@@ -66,15 +68,13 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
           return this.setState({
             title: 'No categories found',
             subCategories: [],
-            showBackButton: true,
             parentCategoryId: null
           })
         }
 
         this.setState({
           title: 'All categories',
-          subCategories: categories,
-          showBackButton: false
+          subCategories: categories
         })
       })
   }
@@ -86,7 +86,6 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
           return this.setState({
             title: 'Category not  found.',
             subCategories: [],
-            showBackButton: true,
             parentCategoryId: null,
             items: []
           })
@@ -96,8 +95,17 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
           title: result.name,
           subCategories: result.subCategories,
           parentCategoryId: result.parentCategoryId,
-          showBackButton: true
         })
+
+        const newTree = [];
+        if (result.parentCategory !== null) {
+          result.parentCategory.parentCategory !== null ?
+            newTree.push(result.parentCategory.parentCategory)
+            : newTree.push(result.parentCategory);
+
+        }
+        newTree.push(result);
+        this.setState({categoryTree: newTree});
       })
   }
 
@@ -134,6 +142,16 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
     }
   }
 
+  private createBreadcrumbs() {
+    if (this.state.categoryTree.length !== 0) {
+      return this.state.categoryTree.map((el, i) =>
+        <Breadcrumb.Item linkAs={Link} linkProps={{to: "/category/" + el.categoryId}} active={i === this.state.categoryTree.length-1} >
+          { el.name }
+        </Breadcrumb.Item>
+      )
+    }
+  }
+
   renderMain(): JSX.Element {
     if (!this.state.isUserLoggedIn) {
       return (
@@ -144,37 +162,39 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
     return (
       <div>
         {
-          this.state.showBackButton
-            ? (
-              <Link to={ '/category/' + (this.state.parentCategoryId ?? '') }>
-                <Button variant="info">
-                  &lt; Back
-                </Button>
-              </Link>
-            )
-            : ''
+          this.props.match?.params.cid ?
+            <Breadcrumb className="breadcrumb-list">
+              <Breadcrumb.Item linkAs={Link} linkProps={{to: "/category"}}>Categories</Breadcrumb.Item>
+
+              {this.createBreadcrumbs()}
+
+            </Breadcrumb>
+            : null
         }
+
         <h1 className="text-center"> { this.state.title } </h1>
 
-        {
-          this.state.subCategories.length > 0
-            ? (
-              <>
-                {this.props.match?.params.cid ? <p>Subcategories:</p> : ""}
-                <ul>
-                  { this.state.subCategories.map(category => (
-                    <li key={ 'category-link-' + category.categoryId }>
-                      <Link to={ '/category/' + category.categoryId  } >
-                        { category.name }
-                      </Link>
-                    </li>
-                  )) }
+        <div className="category-menu">
+          {
+            this.state.subCategories.length > 0
+              ? (
+                <>
 
-                </ul>
-              </>
-            )
-            : ''
-        }
+                  <ul>
+                    { this.state.subCategories.map(category => (
+                      <li key={ 'category-link-' + category.categoryId }>
+                        <Link to={ '/category/' + category.categoryId  } >
+                          { category.name }
+                        </Link>
+                      </li>
+                    )) }
+
+                  </ul>
+                </>
+              )
+              : null
+          }
+        </div>
 
         {
           this.state.subCategories.length === 0 ?
@@ -186,7 +206,7 @@ export default class CategoryPage extends BasePage<CategoryPageProperties> {
               }
             </CardDeck>
             :
-            ""
+            null
         }
       </div>
     );
